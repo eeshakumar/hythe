@@ -1,0 +1,4 @@
+Bootstrap: docker
+From: eeshakumar/hythe:latest
+%environment
+    export MPLBACKEND="agg"

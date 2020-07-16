@@ -1,0 +1,11 @@
+py_library(
+    name = "pylib_fqn",
+    srcs = glob(["**/*.py"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "fqn_config",
+    srcs = glob(["**/*.yaml"]),
+    visibility = ["//visibility:public"],
+)
