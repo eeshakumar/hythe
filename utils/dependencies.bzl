@@ -8,16 +8,20 @@ def _maybe(repo_rule, name, **kwargs):
 def hythe_deps():
 
   _maybe(
-    native.local_repository,
+    git_repository,
     name = "bark_ml_project",
-    path = "/home/eeshakumar/school/master_thesis/code/bark-ml",
+    branch = "macro_actions_fix",
+    remote = "https://github.com/eeshakumar/bark-ml",
+    #path = "/home/ekumar/master_thesis/code/bark-ml",
     #repo_mapping = {"@bark_ml": "@bark_ml//bark_ml"}
   )
 
   _maybe(
-    native.local_repository,
+    git_repository,
     name = "bark_project",
-    path = "/home/eeshakumar/school/master_thesis/code/bark"
+    #path = "/home/ekumar/master_thesis/code/bark"
+    branch = "master",
+    remote = "https://github.com/eeshakumar/bark",
   )
 
   _maybe(
@@ -29,8 +33,10 @@ def hythe_deps():
   )
 
   _maybe(
-    native.new_local_repository,
+    new_git_repository,
     name = "fqn",
-    path = "/home/eeshakumar/school/master_thesis/code/fqf-iqn-qrdqn.pytorch",
-    build_file = "//:utils/BUILD.fqn"
+    branch = "master",
+    remote = "https://github.com/eeshakumar/fqf-iqn-qrdqn.pytorch",
+    #path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
+    build_file = "//:utils/BUILD.fqn",
   )

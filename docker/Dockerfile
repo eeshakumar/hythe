@@ -4,7 +4,6 @@ FROM python:3.7
 ENV PATH /opt/conda/bin:$PATH
 ENV DISPLAY :0
 
-
 # Run installers.
 COPY installation /tmp/installation
 RUN bash /tmp/installation/install_bazel.sh
