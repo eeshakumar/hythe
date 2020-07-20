@@ -25,6 +25,25 @@ py_binary(
 )
 
 py_binary(
+    name = "hy-exp-run",
+    main = "src/experment_runner.py",
+    srcs = [
+         "src/experment_runner.py",
+    ],
+    imports = ['../bark/', '../bark_ml/', '../python/'],
+    data = ["@fqn//:fqn_config",
+            "@bark_project//python:bark.so",
+            "@bark_ml_project//python:bark_ml_library.so"],
+    deps = [
+      "@fqn//:pylib_fqn",
+      "@bark_ml_project//bark_ml/environments:gym",
+      "@bark_ml_project//bark_ml/environments:blueprints",
+      "@hythe//modules/environments:gym",
+      "@hythe//modules/experiments:experiment",
+    ],
+)
+
+py_binary(
     name = "fqf-bark",
     main = "src/fqf_bark.py",
     srcs = [

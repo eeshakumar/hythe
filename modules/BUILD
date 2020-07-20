@@ -12,3 +12,19 @@ py_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "experiment",
+    srcs = [
+        "experiments/experiment.py"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "environment",
+    srcs = [
+        "environments/gym.py"
+    ],
+    visibility = ["//visibility:public"],
+)
