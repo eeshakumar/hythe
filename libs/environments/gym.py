@@ -8,10 +8,12 @@ from bark_ml.environments.blueprints.merging.merging import DiscreteMergingBluep
 from bark_ml.environments.blueprints.intersection.intersection import DiscreteIntersectionBlueprint
 
 
-class HyDiscreteHighway(SingleAgentRuntime, gym.Wrapper):
+class HyDiscreteHighway(SingleAgentRuntime, gym.Env):
 
-    def __init__(self, params):
-        self._blueprint = DiscreteHighwayBlueprint(params)
+    def __init__(self, params, num_scenarios=20, random_seed=0, viewer=False):
+        self._blueprint = DiscreteHighwayBlueprint(params,
+                                                   number_of_senarios=num_scenarios,
+                                                   random_seed=0)
         SingleAgentRuntime.__init__(self, blueprint=self._blueprint, render=True)
 
 
@@ -32,16 +34,16 @@ class HyDiscreteIntersection(SingleAgentRuntime, gym.Wrapper):
 # register gym envs
 
 register(
-    id="hy-highway",
+    id="hyhighway-v0",
     entry_point="hythe.modules.environments.gym:HyDiscreteHighway"
 )
 
 register(
-    id="hy-merging",
+    id="hy-merging-v0",
     entry_point="hythe.modules.environments.gym:HyDiscreteMerging"
 )
 
 register(
-    id="hy-intersection",
+    id="hy-intersection-v0",
     entry_point="hythe.modules.environments.gym:HyDiscreteIntersection"
 )

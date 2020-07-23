@@ -1,90 +1,115 @@
 py_binary(
-    name = "configuration-imports-bin",
-    main = "src/main.py",
+    name = "cib",
     srcs = [
-         "src/main.py",
+        "src/main.py",
     ],
-    imports = ['../python/'],
+    imports = ["../python/"],
+    main = "src/main.py",
     deps = [
-      "@bark_project//modules/runtime:runtime",
-      "@bark_ml//bark_ml/behaviors:behaviors"
+        "@bark_ml_project//bark_ml/behaviors",
+        "@bark_project//modules/runtime",
     ],
 )
 
 py_binary(
     name = "train-fqf",
-    main = "src/fqf.py",
     srcs = [
-         "src/fqf.py",
+        "src/fqf.py",
     ],
-    imports = ['../python/'],
     data = ["@fqn//:fqn_config"],
+    imports = ["../python/"],
+    main = "src/fqf.py",
     deps = [
-      "@fqn//:pylib_fqn"
+        "@fqn//:pylib_fqn",
     ],
 )
 
 py_binary(
     name = "hy-exp-run",
-    main = "src/experment_runner.py",
     srcs = [
-         "src/experment_runner.py",
+        "src/experment_runner.py",
     ],
-    imports = ['../bark/', '../bark_ml/', '../python/'],
-    data = ["@fqn//:fqn_config",
-            "@bark_project//python:bark.so",
-            "@bark_ml_project//python:bark_ml_library.so"],
+    data = [
+        "//configuration/params:hy_params",
+        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//python:bark.so",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/experment_runner.py",
     deps = [
-      "@fqn//:pylib_fqn",
-      "@bark_ml_project//bark_ml/environments:gym",
-      "@bark_ml_project//bark_ml/environments:blueprints",
-      "@hythe//modules/environments:gym",
-      "@hythe//modules/experiments:experiment",
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_project//modules/runtime/viewer:py_viewer",
+        "@fqn//:pylib_fqn",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
     ],
 )
 
 py_binary(
     name = "fqf-bark",
-    main = "src/fqf_bark.py",
     srcs = [
-         "src/fqf_bark.py",
+        "src/fqf_bark.py",
     ],
-    imports = ['../bark/', '../bark_ml/', '../python/'],
-    data = ["@fqn//:fqn_config",
-            "@bark_project//python:bark.so",
-            "@bark_ml_project//python:bark_ml_library.so"],
+    data = [
+        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//python:bark.so",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/fqf_bark.py",
     deps = [
-      "@fqn//:pylib_fqn",
-      "@bark_ml_project//bark_ml/environments:gym",
-      "@bark_ml_project//bark_ml/environments:blueprints"
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@fqn//:pylib_fqn",
     ],
 )
 
 py_binary(
     name = "qrdqn-bark",
-    main = "src/qrdqn_bark.py",
     srcs = [
-         "src/qrdqn_bark.py",
+        "src/qrdqn_bark.py",
     ],
-    imports = ['../bark/', '../bark_ml/', '../python/'],
-    data = ["@fqn//:fqn_config",
-            "@bark_project//python:bark.so",
-            "@bark_ml_project//python:bark_ml_library.so"],
+    data = [
+        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//python:bark.so",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/qrdqn_bark.py",
     deps = [
-      "@fqn//:pylib_fqn",
-      "@bark_ml_project//bark_ml/environments:gym",
-      "@bark_ml_project//bark_ml/environments:blueprints"
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@fqn//:pylib_fqn",
     ],
 )
 
 py_test(
-  name = "continuous_env",
-  srcs = ["src/continuous_env.py"],
-  data = ["@bark_project//python:bark.so",
-          "@bark_ml_project//python:bark_ml_library.so"],
-  imports = ['../bark_ml/', '../python/'],
-  deps = [
-    "@bark_ml_project//bark_ml/environments:gym",
-    "@bark_ml_project//bark_ml/environments:blueprints",
-  ]
+    name = "continuous_env",
+    srcs = ["src/continuous_env.py"],
+    data = [
+        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//python:bark.so",
+    ],
+    imports = [
+        "../bark_ml/",
+        "../python/",
+    ],
+    deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+    ],
 )
