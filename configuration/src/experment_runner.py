@@ -8,7 +8,9 @@ from hythe.libs.environments.gym import HyDiscreteHighway
 from fqf_iqn_qrdqn.agent import FQFAgent
 from bark_project.modules.runtime.commons.parameters import ParameterServer
 
-from bark_ml.environments.blueprints import DiscreteHighwayBlueprint
+from bark_ml.evaluators.goal_reached import GoalReached
+from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
+from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
 
 def configure_args(parser=None):
@@ -22,7 +24,7 @@ def configure_args(parser=None):
     return parser.parse_args()
 
 
-def run(env):
+def configure_agent(env):
     args = configure_args()
 
     with open(args.config) as f:
@@ -34,18 +36,37 @@ def run(env):
         'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
     agent = FQFAgent(env=env, test_env=env, log_dir=log_dir, seed=0,
                      cuda=args.cuda, **config)
-    # agent.run()
+    return agent
 
-    exp = Experiment(agent=agent)
+
+def run_single_episode(params, env):
+    agent = configure_agent(env)
+
+    exp = Experiment(params=params, agent=agent)
+    exp.run_single_episode()
+
+
+def run(params, env):
+    agent = configure_agent(env)
+
+    exp = Experiment(params=params, agent=agent)
     exp.run()
 
 
 def main():
-    # experiment_params = Params(["xonfiguration/params/common_parameters.yaml"])
     params = ParameterServer()
-    env = HyDiscreteHighway(params=params, num_scenarios=10,
-                            random_seed=0, viewer=False)
-    run(env)
+    map_filename = "bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
+    num_scenarios = 25
+    random_seed = 0
+    behavior = BehaviorDiscreteMacroActionsML(params)
+    evaluator = GoalReached(params)
+    observer = NearestAgentsObserver(params)
+    env = HyDiscreteHighway(params=params, num_scenarios=num_scenarios,
+                            random_seed=random_seed, behavior=behavior,
+                            evaluator=evaluator, observer=observer,
+                            map_filename=map_filename)
+
+    run(params, env)
     return
 
 

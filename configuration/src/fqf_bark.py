@@ -11,7 +11,9 @@ from bark_ml.environments.blueprints import ContinuousHighwayBlueprint
 # from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.environments.gym import DiscreteHighwayGym, ContinuousHighwayGym
 
+import sys
 
+print(sys.path)
 # env_id = 'highway-v0'
 # env = gym.make(env_id)
 #

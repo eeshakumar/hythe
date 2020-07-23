@@ -46,6 +46,7 @@ py_binary(
         "@bark_ml_project//bark_ml/environments:gym",
         "@bark_project//modules/runtime/viewer:py_viewer",
         "@fqn//:pylib_fqn",
+        "@hythe//libs/blueprint",
         "@hythe//libs/environments:gym",
         "@hythe//libs/experiments:experiment",
     ],
