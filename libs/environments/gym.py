@@ -12,18 +12,21 @@ from hythe.libs.blueprint.blueprint import HyHighwayDiscreteBlueprint
 
 class HyDiscreteHighway(SingleAgentRuntime, gym.Env):
 
-    def __init__(self, params, num_scenarios=20, random_seed=0, viewer=True,
+    def __init__(self, params, num_scenarios=10, random_seed=0, viewer=True,
                  behavior=None, evaluator=None, observer=None, scenario_generation=None,
-                 map_filename=None):
-        self._blueprint = HyHighwayDiscreteBlueprint(params=params,
-                                                     map_filename=map_filename,
-                                                     num_scenarios=num_scenarios,
-                                                     random_seed=random_seed,
-                                                     behavior=behavior,
-                                                     evaluator=evaluator,
-                                                     observer=observer,
-                                                     scenario_generation=scenario_generation,
-                                                     viewer=viewer)
+                 map_filename=None, blueprint=None):
+        if blueprint is None:
+            self._blueprint = HyHighwayDiscreteBlueprint(params=params,
+                                                         map_filename=map_filename,
+                                                         num_scenarios=num_scenarios,
+                                                         random_seed=random_seed,
+                                                         behavior=behavior,
+                                                         evaluator=evaluator,
+                                                         observer=observer,
+                                                         scenario_generation=scenario_generation,
+                                                         viewer=viewer)
+        else:
+            self._blueprint = blueprint
         SingleAgentRuntime.__init__(self, blueprint=self._blueprint, render=True)
 
     @property

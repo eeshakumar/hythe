@@ -58,8 +58,7 @@ class HyHighwayBlueprint(Blueprint):
                            dt=dt,
                            evaluator=evaluator,
                            observer=observer,
-                           ml_behavior=behavior
-                           )
+                           ml_behavior=behavior)
 
 
 class HyHighwayDiscreteBlueprint(HyHighwayBlueprint):

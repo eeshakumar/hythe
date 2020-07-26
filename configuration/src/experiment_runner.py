@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import os
+from pathlib import Path
 from datetime import datetime
 import yaml
 from hythe.libs.experiments.experiment import Experiment
@@ -34,29 +35,41 @@ def configure_agent(env):
     time = datetime.now().strftime("%Y%m%d-%H%M")
     log_dir = os.path.join(
         'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
-    agent = FQFAgent(env=env, test_env=env, log_dir=log_dir, seed=0,
+    agent = FQFAgent(env=env, test_env=env, log_dir=log_dir, seed=args.seed,
                      cuda=args.cuda, **config)
     return agent
 
 
+def configure_params(params):
+    import random
+    experiment_seed = random.randint(0, 1000)
+    params["Experiment"]["random_seed"] = experiment_seed
+    params["Experiment"]["dir"] = "/home/ekumar/master_thesis/code/hythe/output/experiments/exp_{}".format(experiment_seed)
+    Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
+    params["Experiment"]["params"] = "params_{}_{}.json"
+    params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
+    params["Experiment"]["num_episodes"] = 10
+    params["Experiment"]["map_filename"] = "bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
+
+    return params
+
+
 def run_single_episode(params, env):
     agent = configure_agent(env)
-
     exp = Experiment(params=params, agent=agent)
     exp.run_single_episode()
 
 
 def run(params, env):
     agent = configure_agent(env)
-
     exp = Experiment(params=params, agent=agent)
     exp.run()
 
 
 def main():
     params = ParameterServer()
-    map_filename = "bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
-    num_scenarios = 25
+    params = configure_params(params)
+    num_scenarios = 10
     random_seed = 0
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -64,7 +77,7 @@ def main():
     env = HyDiscreteHighway(params=params, num_scenarios=num_scenarios,
                             random_seed=random_seed, behavior=behavior,
                             evaluator=evaluator, observer=observer,
-                            map_filename=map_filename)
+                            map_filename=params["Experiment"]["map_filename"])
 
     run(params, env)
     return

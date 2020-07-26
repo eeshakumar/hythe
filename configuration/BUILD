@@ -27,7 +27,7 @@ py_binary(
 py_binary(
     name = "hy-exp-run",
     srcs = [
-        "src/experment_runner.py",
+        "src/experiment_runner.py",
     ],
     data = [
         "//configuration/params:hy_params",
@@ -40,8 +40,37 @@ py_binary(
         "../bark_ml/",
         "../python/",
     ],
-    main = "src/experment_runner.py",
+    main = "src/experiment_runner.py",
     deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_project//modules/runtime/viewer:py_viewer",
+        "@fqn//:pylib_fqn",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
+    ],
+)
+
+py_binary(
+    name = "hy-exp-load",
+    srcs = [
+        "src/experiment_loader.py",
+    ],
+    data = [
+        "//configuration/params:hy_params",
+        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//python:bark.so",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/experiment_loader.py",
+    deps = [
+        "@bark_ml_project//bark_ml/behaviors",
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
         "@bark_project//modules/runtime/viewer:py_viewer",
