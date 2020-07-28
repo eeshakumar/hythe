@@ -12,7 +12,7 @@ from hythe.libs.blueprint.blueprint import HyHighwayDiscreteBlueprint
 
 class HyDiscreteHighway(SingleAgentRuntime, gym.Env):
 
-    def __init__(self, params, num_scenarios=10, random_seed=0, viewer=True,
+    def __init__(self, params=None, num_scenarios=10, random_seed=0, viewer=True,
                  behavior=None, evaluator=None, observer=None, scenario_generation=None,
                  map_filename=None, blueprint=None):
         if blueprint is None:

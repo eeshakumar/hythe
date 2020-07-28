@@ -41,8 +41,10 @@ def configure_agent(env):
 
 
 def configure_params(params):
-    import random
-    experiment_seed = random.randint(0, 1000)
+    # import random
+    # experiment_seed = random.randint(0, 1000)
+    import uuid
+    experiment_seed = str(uuid.uuid4())
     params["Experiment"]["random_seed"] = experiment_seed
     params["Experiment"]["dir"] = "/home/ekumar/master_thesis/code/hythe/output/experiments/exp_{}".format(experiment_seed)
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)

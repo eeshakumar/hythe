@@ -5,3 +5,11 @@ py_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "experiment_manager",
+    srcs = [
+        "experiment_manager.py",
+    ],
+    visibility = ["//visibility:public"],
+)

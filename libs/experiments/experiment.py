@@ -12,10 +12,11 @@ from hythe.libs.environments.gym import HyDiscreteHighway
 
 class Experiment(object):
 
-    def __init__(self, params, agent):
+    def __init__(self, params, agent, scenario_generation=None):
         self._agent = agent
         self._env = agent.env
         self._blueprint = self._env.blueprint
+        self._scenario_generation = self._blueprint.scenario_generation
         self._params = params
         self.init_params(params)
 
