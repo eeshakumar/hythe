@@ -19,6 +19,7 @@ py_library(
     srcs = glob([
         "experiments/*/*.py",
         "environments/*/*.py",
+        "dispatch/*/*.py",
     ]),
     deps = "//*/*.py",
 )
