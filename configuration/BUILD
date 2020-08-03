@@ -47,6 +47,8 @@ py_binary(
         "@bark_project//modules/runtime/viewer:py_viewer",
         "@fqn//:pylib_fqn",
         "@hythe//libs/blueprint",
+        "@hythe//libs/dispatch:dispatcher",
+        "@hythe//libs/dispatch:parallel_dispatcher",
         "@hythe//libs/environments:gym",
         "@hythe//libs/experiments:experiment",
         "@hythe//libs/experiments:experiment_manager",

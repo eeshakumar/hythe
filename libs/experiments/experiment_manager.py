@@ -1,4 +1,6 @@
 import uuid
+from collections import OrderedDict
+
 import yaml
 from pathlib import Path
 from argparse import ArgumentParser
@@ -6,14 +8,20 @@ from fqf_iqn_qrdqn.agent import FQFAgent
 import os
 from datetime import datetime
 
+from bark_project.modules.runtime.commons.parameters import ParameterServer
+from hythe.libs.dispatch.sequential_dispatcher import SequentialDispatcher
 from hythe.libs.environments.gym import HyDiscreteHighway
 from hythe.libs.experiments.experiment import Experiment
 
 
 class ExperimentManager(object):
 
-    def __init__(self, num_experiments=2, num_scenarios=10, random_seed=0,
+    def __init__(self, dispatcher=None, num_experiments=2, num_scenarios=10, random_seed=0,
                  params_list=None, params_files=None):
+        if dispatcher is None:
+            self._dispatcher = SequentialDispatcher()
+        else:
+            self._dispatcher = dispatcher
         # Move assertion
         # if params_list, then launch new experiments, else restore blueprints.
         assert any([params_files, params_list]) is not None
@@ -21,13 +29,15 @@ class ExperimentManager(object):
         if params_list is not None:
             self._params_list = self.configure_params(params_list)
         elif params_files is not None:
-            self._params_list = self.configure_params(is_files=True)
+            self._params_list = self.configure_params(params_files, is_files=True)
 
         self._num_scenarios = num_scenarios
         self.random_seed = random_seed
         # self._scenarios_dict = self.init_scenarios()
         self._experiments = self.init_experiments()
+        self._dispatcher.set_dispatch_dict(self._experiments)
         self.init_experiments()
+        self.experiment_process_list = []
 
     def init_scenarios(self):
         # For LOADED EXPERIMENTS
@@ -79,13 +89,22 @@ class ExperimentManager(object):
             return some_params
         else:
             params_list = []
+            exp_seeds = []
             for params_file in some_params:
-                break
-                # Do some init for each file json.load()
+                json_data = Experiment.load_json(params_file)
+                exp_seed = json_data["Experiment"]["random_seed"]
+                if exp_seed not in exp_seeds:
+                    print("Adding seed:", exp_seed)
+                    exp_seeds.append(exp_seed)
+                    json_params = {"json": json_data}
+                    params = ParameterServer(**json_params)
+                    params_list.append(params)
+
+            print(len(params_list))
             return params_list
 
     def init_experiments(self):
-        experiments = {}
+        experiments = OrderedDict()
         for params in self._params_list:
             env = HyDiscreteHighway(params=params, num_scenarios=self._num_scenarios,
                                     random_seed=self.random_seed,
@@ -94,19 +113,12 @@ class ExperimentManager(object):
             experiments[params["Experiment"]["random_seed"]] = Experiment(params, agent)
         return experiments
 
-    def dispatch(self):
-        from multiprocessing import Process
-        for (seed, experiment) in self._experiments.items():
-            p = Process(target=self.run, args=(experiment, ))
-            p.start()
-            p.join()
-        return
+    def run_experiments(self):
+        self._dispatcher.dispatch()
 
-    def run(self, experiment):
-        # method/process for single experiment execution
-        print("Running Experiment with seed:", experiment.random_seed)
-        experiment.run()
-        return
+    @property
+    def dispatcher(self):
+        return self._dispatcher
 
     @property
     def experiments(self):

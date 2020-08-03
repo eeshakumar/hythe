@@ -12,4 +12,8 @@ py_library(
         "experiment_manager.py",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@hythe//libs/dispatch:dispatcher",
+        "@hythe//libs/dispatch:sequential_dispatcher",
+    ],
 )
