@@ -81,7 +81,7 @@ def main():
                             evaluator=evaluator, observer=observer,
                             map_filename=params["Experiment"]["map_filename"])
 
-    # run(params, env)
+    run(params, env)
     return
 
 

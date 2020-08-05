@@ -19,7 +19,7 @@ def main():
         params2 = ParameterServer()
         params = [params1, params2]
         manager = ExperimentManager(params_list=params)
-    # manager.run_experiments()
+    manager.run_experiments()
     return
 
 
