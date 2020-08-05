@@ -18,7 +18,7 @@ def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
     parser.add_argument(
-        '--config', type=str, default=os.path.join('../fqn/config', 'fqf.yaml'))
+        '--config', type=str, default=os.path.join('external/fqn/config', 'fqf.yaml'))
     parser.add_argument('--env_id', type=str, default='hyhighway-v0')
     parser.add_argument('--cuda', action='store_true', default=True)
     parser.add_argument('--seed', type=int, default=122)
@@ -46,13 +46,12 @@ def configure_params(params):
     import uuid
     experiment_seed = str(uuid.uuid4())
     params["Experiment"]["random_seed"] = experiment_seed
-    params["Experiment"]["dir"] = "/home/ekumar/master_thesis/code/hythe/output/experiments/exp_{}".format(experiment_seed)
+    params["Experiment"]["dir"] = str(Path.home().joinpath(".cache/output/experiments/exp_{}".format(experiment_seed)))
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
     params["Experiment"]["num_episodes"] = 10
-    params["Experiment"]["map_filename"] = "bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
-
+    params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
 
@@ -69,6 +68,7 @@ def run(params, env):
 
 
 def main():
+    print("Experiment server at:", os.getcwd())
     params = ParameterServer()
     params = configure_params(params)
     num_scenarios = 10
@@ -81,7 +81,7 @@ def main():
                             evaluator=evaluator, observer=observer,
                             map_filename=params["Experiment"]["map_filename"])
 
-    run(params, env)
+    # run(params, env)
     return
 
 

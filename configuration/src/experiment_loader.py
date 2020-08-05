@@ -7,7 +7,7 @@ from hythe.libs.experiments.experiment import Experiment
 from fqf_iqn_qrdqn.agent import FQFAgent
 
 episode_num = 2
-exp_dirname = "/home/ekumar/master_thesis/code/hythe/output/experiments/exp.175/"
+exp_dirname = "~/.cache/output/experiments/exp.175/"
 
 
 def configure_args(parser=None):

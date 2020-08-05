@@ -108,18 +108,21 @@ class Experiment(object):
             return data
 
     @staticmethod
-    def restore_blueprint(params_file,
+    def restore_blueprint(some_params,
                           scenario_generated_file,
                           num_scenarios=10,
                           behavior=None,
                           evaluator=None,
                           observer=None):
 
-        json_data = Experiment.load_json(params_file)
-        json_params = {"json": json_data}
-        params = ParameterServer(**json_params)
+        if isinstance(some_params, ParameterServer):
+            params = some_params
+        else:
+            json_data = Experiment.load_json(some_params)
+            json_params = {"json": json_data}
+            params = ParameterServer(**json_params)
         map_file_name = params["Experiment"]["map_filename"] or \
-                        "bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
+                        "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
         scenario_generation = ConfigWithEase(num_scenarios, params=params,
                                              map_file_name=map_file_name)
         scenario_generation.load_scenario_list(scenario_generated_file)

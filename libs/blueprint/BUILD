@@ -5,3 +5,11 @@ py_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "maps",
+    srcs = glob([
+        "maps/*.xodr",
+    ]),
+    visibility = ["//visibility:public"],
+)
