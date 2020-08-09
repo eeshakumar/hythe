@@ -110,7 +110,7 @@ class Experiment(object):
     @staticmethod
     def restore_blueprint(some_params,
                           scenario_generated_file,
-                          num_scenarios=10,
+                          num_scenarios=25,
                           behavior=None,
                           evaluator=None,
                           observer=None):

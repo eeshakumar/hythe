@@ -16,7 +16,7 @@ from hythe.libs.experiments.experiment import Experiment
 
 class ExperimentManager(object):
 
-    def __init__(self, dispatcher=None, num_experiments=2, num_scenarios=10, random_seed=0,
+    def __init__(self, dispatcher=None, num_experiments=2, num_scenarios=25, random_seed=0,
                  params_list=None, params_files=None):
         if dispatcher is None:
             self._dispatcher = SequentialDispatcher()

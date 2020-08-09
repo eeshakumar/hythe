@@ -21,3 +21,11 @@ py_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "remote_dispatcher",
+    srcs = [
+        "remote_dispatcher.py",
+    ],
+    visibility = ["//visibility:public"],
+)

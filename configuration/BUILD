@@ -25,6 +25,25 @@ py_binary(
 )
 
 py_binary(
+    name = "hy-x-dispatch",
+    srcs = [
+        "src/hy_x_dispatch.py",
+    ],
+    data = [
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/hy_x_dispatch.py",
+    deps = [
+        "@hythe//libs/dispatch:dispatcher",
+        "@hythe//libs/dispatch:remote_dispatcher",
+    ],
+)
+
+py_binary(
     name = "hy-x-run",
     srcs = [
         "src/x_experiments_runner.py",
