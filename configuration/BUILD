@@ -81,8 +81,8 @@ py_binary(
     ],
     data = [
         "//configuration/params:hy_params",
-        "@bark_ml_project//python:bark_ml_library.so",
-        "@bark_project//python:bark.so",
+        #        "@bark_ml_project//python:bark_ml_library.so",
+        #        "@bark_project//python:bark.so",
         "@fqn//:fqn_config",
     ],
     imports = [
@@ -94,7 +94,7 @@ py_binary(
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
-        "@bark_project//modules/runtime/viewer:py_viewer",
+        "@bark_project//bark/runtime/viewer:py_viewer",
         "@fqn//:pylib_fqn",
         "@hythe//libs/blueprint",
         "@hythe//libs/environments:gym",
