@@ -93,7 +93,7 @@ class ExperimentManager(object):
                 Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
                 params["Experiment"]["params"] = "params_{}_{}.json"
                 params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-                params["Experiment"]["num_episodes"] = 10
+                params["Experiment"]["num_episodes"] = 10000
                 params["Experiment"][
                     "map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
                 print("Configured params with random seed:", experiment_seed)
