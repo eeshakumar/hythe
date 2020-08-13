@@ -48,7 +48,7 @@ def configure_params(params):
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 1000
+    params["Experiment"]["num_episodes"] = 10
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -69,7 +69,7 @@ def main():
     print("Experiment server at:", os.getcwd())
     params = ParameterServer()
     params = configure_params(params)
-    num_scenarios = 25
+    num_scenarios = 10
     random_seed = 0
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)

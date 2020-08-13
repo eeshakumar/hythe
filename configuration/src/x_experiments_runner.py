@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from hythe.libs.experiments.experiment_manager import ExperimentManager
 
-is_load = True
+is_load = False
 
 
 def main():
@@ -16,9 +16,8 @@ def main():
         manager = ExperimentManager(params_files=params)
     else:
         params1 = ParameterServer()
-        params2 = ParameterServer()
-        params = [params1, params2]
-        manager = ExperimentManager(params_list=params)
+        params = [params1]
+        manager = ExperimentManager(params_list=params, num_scenarios=10)
     manager.run_experiments()
     return
 
