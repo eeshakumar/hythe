@@ -4,7 +4,8 @@
 # https://opensource.org/licenses/MIT
 import numpy as np
 from collections import OrderedDict
-from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
+from bark_hypothesis_uct_project.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
+from bark_ml_project.observers.nearest_state_observer import NearestAgentsObserver
 
 
 class BeliefObserver(NearestAgentsObserver):
@@ -18,7 +19,7 @@ class BeliefObserver(NearestAgentsObserver):
         super(BeliefObserver, self).__init__(params)
         self.hypothesis_set = hypothesis_set
         self.splits = splits
-        self.belief_calculator = BeliefCalculator(hypothesis_set)
+        self.belief_calculator = BeliefCalculator(params, hypothesis_set)
         self.beliefs = self.belief_calculator.get_beliefs()
 
     def Reset(self, world):
@@ -38,11 +39,11 @@ class BeliefObserver(NearestAgentsObserver):
         :return: Concatenated state with beliefs.
         """
         concatenated_state, agent_ids_by_nearest = super(BeliefObserver, self).Observe(world)
-        self.belief_calculator = self.belief_calculator.calculate_update(world)
+        self.belief_calculator = self.belief_calculator.BeliefUpdate(world)
         # beliefs is a dictionary mapping every agent id to list of beliefs.
         # the agent ids are ordered by distance.
-        beliefs = self.belief_calculator.get_beliefs()
-        self.beliefs = BeliefObserver.order_beliefs(beliefs, agent_ids_by_nearest)
+        beliefs = self.belief_calculator.GetBeliefs()
+        self.beliefs = BeliefObserver.order_beliefs(agent_ids_by_nearest)
         len_beliefs, beliefs_arr = self.beliefs_array()
         beliefs_concatenated_state = np.zeros(concatenated_state.shape[0] + len_beliefs)
         beliefs_concatenated_state = np.concatenate([concatenated_state, beliefs_arr])
@@ -61,14 +62,13 @@ class BeliefObserver(NearestAgentsObserver):
         assert len_beliefs == len(beliefs_list)
         return len_beliefs, np.asarray(beliefs_list)
 
-    @staticmethod
-    def order_beliefs(beliefs, agent_ids_by_nearest):
+    def order_beliefs(self, agent_ids_by_nearest):
         """
         Order beliefs based on nearest agent. I.e. the first agent id (key) of ordered_beliefs is the nearest agent.
         :param beliefs:
         :param agent_ids_by_nearest:
         :return:
         """
-        ordered_beliefs = OrderedDict({agent_id:beliefs[agent_id] for agent_id in agent_ids_by_nearest})
+        ordered_beliefs = OrderedDict({agent_id:self.beliefs[agent_id] for agent_id in agent_ids_by_nearest})
         return ordered_beliefs
 

@@ -103,6 +103,41 @@ py_binary(
 )
 
 py_binary(
+    name = "hy-x-beliefs",
+    srcs = [
+        "src/hy_x_beliefs.py",
+    ],
+    data = [
+        "//configuration/params:hy_params",
+        #        "@bark_ml_project//python:bark_ml_library.so",
+        "@bark_project//bark:generate_core",
+        #        "@bark_project//python:bark.so",
+        "@fqn//:fqn_config",
+        "@bark_hypothesis_uct_project//bark_mcts/models/behavior/hypothesis/behavior_space",
+    ],
+    imports = [
+        "../../../python/",
+        "../bark/",
+        "../bark_mcts/",
+        "../bark_ml/",
+        "../python/",
+    ],
+    main = "src/hy_x_beliefs.py",
+    deps = [
+        "@bark_hypothesis_uct_project//bark_mcts/models/behavior/hypothesis/behavior_space",
+        "@bark_hypothesis_uct_project//util/debug:debug_settings",
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_project//bark/runtime/commons",
+        "@bark_project//bark/runtime/viewer:py_viewer",
+        "@fqn//:pylib_fqn",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
+    ],
+)
+
+py_binary(
     name = "hy-exp-load",
     srcs = [
         "src/experiment_loader.py",
