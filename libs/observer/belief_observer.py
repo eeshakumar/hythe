@@ -4,8 +4,8 @@
 # https://opensource.org/licenses/MIT
 import numpy as np
 from collections import OrderedDict
-from bark_hypothesis_uct_project.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
-from bark_ml_project.observers.nearest_state_observer import NearestAgentsObserver
+# from bark_mcts.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
+from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 
 
 class BeliefObserver(NearestAgentsObserver):

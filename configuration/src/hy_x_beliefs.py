@@ -1,15 +1,20 @@
 import os
 print(os.environ["PYTHONPATH"])
 
-from bark_hypothesis_uct_project.bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
-from bark_project.modules.runtime.commons.parameters import ParameterServer
+import bark.core
+import bark.core.models.behavior
+from bark.runtime.commons.parameters import ParameterServer
 from hythe.libs.observer.belief_observer import BeliefObserver
 from bark_ml.evaluators.goal_reached import GoalReached
-from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
+from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteML
 import yaml
+from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
+
 from hythe.libs.experiments.experiment import Experiment
 from hythe.libs.environments.gym import HyDiscreteHighway
 from fqf_iqn_qrdqn.agent import FQFAgent
+
+
 
 
 def configure_args(parser=None):
@@ -72,7 +77,7 @@ def main():
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=3)
     observer = BeliefObserver(params, hypothesis_set)
-    behavior = BehaviorDiscreteMacroActionsML(params)
+    behavior = BehaviorDiscreteML(params)
     evaluator = GoalReached(params)
 
     num_scenarios = 10
