@@ -101,6 +101,8 @@ py_binary(
         "@fqn//:pylib_fqn",
         "@hythe//libs/blueprint",
         "@hythe//libs/environments:gym",
+        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
         "@hythe//libs/experiments:experiment",
     ],
 )

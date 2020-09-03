@@ -24,3 +24,6 @@ load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
 load("@benchmark_database//load:load.bzl", "benchmark_database_release")
 benchmark_database_dependencies()
 benchmark_database_release()
+
+load("@planner_uct//util:deps.bzl", "planner_uct_rules_dependencies")
+planner_uct_rules_dependencies()

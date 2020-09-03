@@ -110,7 +110,7 @@
             </laneSection>
         </lanes>
     </road>
-    <road name="Road 1" length="5.0799694474405115e+1" id="1" junction="-1">
+    <road name="Road 1" length="20.0799694474405115e+1" id="1" junction="-1">
         <link>
             <predecessor elementType="road" elementId="0" contactPoint="end"/>
         </link>
@@ -127,7 +127,7 @@
             <geometry s="9.5629057390654424e+0" x="9.2281286606125980e+2" y="1.0043196293927512e+3" hdg="-3.2185216416142906e+0" length="1.4357800081199468e+0">
                 <arc curvature="-2.0000000000000000e-3"/>
             </geometry>
-            <geometry s="1.0998685747185391e+1" x="9.2138149287826297e+2" y="1.0044320287974191e+3" hdg="3.0617921055491002e+0" length="3.9801008727219724e+1">
+            <geometry s="1.0998685747185391e+1" x="9.2138149287826297e+2" y="1.0044320287974191e+3" hdg="3.0617921055491002e+0" length="18.9801008727219724e+1">
                 <line/>
             </geometry>
         </planView>
@@ -161,7 +161,7 @@
                         <link>
                             <predecessor id="-2"/>
                         </link>
-                        <width sOffset="0.0000000000000000e+0" a="2.6780066324201321e+0" b="-1.6717653406648054e-3" c="5.1557167545292610e-6" d="1.4827865401621225e-7"/>
+                        <width sOffset="0.0000000000000000e+0" a="2.6780066324201321e+0" b="0.0000000000000000e+0" c="0.0000000000000000e+0" d="0.0000000000000000e+0"/>
                         <roadMark sOffset="0.0000000000000000e+0" type="solid" material="standard" color="white" width="1.2500000000000000e-1" laneChange="none"/>
                         <userData>
                             <vectorLane sOffset="0.0000000000000000e+0" laneId="{83c77705-5689-42ba-bb58-4263aa27c2c7}" travelDir="forward"/>

@@ -36,7 +36,7 @@ cc_library(
         name = "bark_project",
         #        path = "/home/ekumar/master_thesis/code/bark",
         #        branch = "master",
-        commit = "bce6c3c129e232b209bed85c69a93e2a62b52cac",
+        commit = "bef1805be75287584ac8bea7aa777df36bdf5d26",
         remote = "https://github.com/bark-simulator/bark",
     )
 
@@ -55,4 +55,13 @@ cc_library(
         remote = "https://github.com/eeshakumar/fqf-iqn-qrdqn.pytorch",
         #path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
         build_file = "//:utils/BUILD.fqn",
+    )
+
+    _maybe(
+        #new_git_repository,
+        native.local_repository,
+        name = "planner_uct",
+       # commit = "39fc32eed53fa39f6fd46b1996028b9bb4c1122e",
+        #remote = "https://github.com/juloberno/bark_hypothesis_uct",
+        path = "/home/julo/development/bark_hypothesis_uct"
     )

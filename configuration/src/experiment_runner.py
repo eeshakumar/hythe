@@ -20,6 +20,10 @@ from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 from load.benchmark_database import BenchmarkDatabase
 from serialization.database_serializer import DatabaseSerializer
 
+from bark.runtime.scenario.scenario_generation.configurable_scenario_generation \
+  import add_config_reader_module
+add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
+
 def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
@@ -73,7 +77,7 @@ def run(params, env):
 
 def main():
     print("Experiment server at:", os.getcwd())
-    params = ParameterServer()
+    params = ParameterServer(filename="configuration/params/default_exp_runne_params.json")
     params = configure_params(params)
     num_scenarios = 5
     random_seed = 0
@@ -84,13 +88,16 @@ def main():
                         x_range=[-35, 35],
                         y_range=[-35, 35],
                         follow_agent_id=True)
-
+    params.Save(filename="./default_exp_runne_params.json")
     # database creation 
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2, num_serialize_scenarios=20) # increase the number of serialize scenarios to 100
     dbs.process("configuration/database")
     local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
-    scenario_generator, _, _ = db.get_scenario_generation(0)
+
+    # switch this to other generator to get other index
+    scenario_generator, _, _ = db.get_scenario_generator(0)
+    #scenario_generator, _, _ = db.get_scenario_generator(1)
 
     env = GymSingleAgentRuntime(ml_behavior = behavior,
                                 observer = observer,
@@ -98,7 +105,7 @@ def main():
                                 step_time=0.2,
                                 viewer=viewer,
                                 scenario_generator=scenario_generator,
-                                render)
+                                render=True)
 
     # run(params, env)
     # from gym.envs.registration import register
@@ -109,7 +116,7 @@ def main():
     # import gym
     # env = gym.make("highway-v1")
     env.reset()
-    actions = [7]*100
+    actions = [5]*100
     print(actions)
     for action in actions:
         env.step(action)
