@@ -58,10 +58,8 @@ cc_library(
     )
 
     _maybe(
-        #new_git_repository,
-        native.local_repository,
+        git_repository,
         name = "planner_uct",
-       # commit = "39fc32eed53fa39f6fd46b1996028b9bb4c1122e",
-        #remote = "https://github.com/juloberno/bark_hypothesis_uct",
-        path = "/home/julo/development/bark_hypothesis_uct"
+        commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
+        remote = "https://github.com/juloberno/bark_hypothesis_uct",
     )
