@@ -47,11 +47,12 @@ class Experiment(object):
 
     def save(self, episode_num):
         try:
-            scenarios_filename, params_filename = self.update_filenames(episode_num=episode_num)
-            self._blueprint.scenario_generation.dump_scenario_list(scenarios_filename)
+            if episode_num % 1000 == 0:
+                scenarios_filename, params_filename = self.update_filenames(episode_num=episode_num)
+                self._blueprint.scenario_generation.dump_scenario_list(scenarios_filename)
 
-            self._blueprint.scenario_generation.params.Save(params_filename)
-            self._agent.save_models(self.dir)
+                self._blueprint.scenario_generation.params.Save(params_filename)
+                self._agent.save_models(self.dir)
         except TypeError or IOError as error:
             print("Could not save experiment:", error)
 
