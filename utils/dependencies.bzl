@@ -7,11 +7,25 @@ def _maybe(repo_rule, name, **kwargs):
 
 def hythe_deps():
     _maybe(
+        native.new_local_repository,
+        name = "python_linux",
+        path = "./python/venv/",
+        build_file_content = """
+cc_library(
+    name = "python-lib",
+    srcs = glob(["lib/libpython3.*", "libs/python3.lib", "libs/python36.lib"]),
+    hdrs = glob(["include/**/*.h", "include/*.h"]),
+    includes = ["include/python3.6m", "include", "include/python3.7m", "include/python3.5m"], 
+    visibility = ["//visibility:public"],
+)
+        """)
+
+    _maybe(
         #        native.local_repository,
         git_repository,
         name = "bark_ml_project",
-        branch = "macro_actions_fix",
-        remote = "https://github.com/eeshakumar/bark-ml",
+        commit = "5d81994712ccb6eb73da7420bf487110ed16ebeb",
+        remote = "https://github.com/bark-simulator/bark-ml",
         #        path = "/home/ekumar/master_thesis/code/bark-ml",
         #repo_mapping = {"@bark_ml": "@bark_ml//bark_ml"}
     )
@@ -22,8 +36,8 @@ def hythe_deps():
         name = "bark_project",
         #        path = "/home/ekumar/master_thesis/code/bark",
         #        branch = "master",
-        commit = "6e1080ed07f9a47973e553c78697910c90b84bf2",
-        remote = "https://github.com/eeshakumar/bark",
+        commit = "bce6c3c129e232b209bed85c69a93e2a62b52cac",
+        remote = "https://github.com/bark-simulator/bark",
     )
 
     _maybe(

@@ -5,6 +5,6 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@bark_project//modules/runtime/viewer:py_viewer",
+        "@bark_project//bark/runtime/viewer:py_viewer",
     ],
 )

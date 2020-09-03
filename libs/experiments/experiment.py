@@ -2,8 +2,8 @@ from os import path, listdir
 from json import load as json_load
 import glob
 
-from bark_project.modules.runtime.commons.parameters import ParameterServer
-from bark_project.modules.runtime.scenario.scenario_generation.config_with_ease import \
+from bark_project.bark.runtime.commons.parameters import ParameterServer
+from bark_project.bark.runtime.scenario.scenario_generation.config_with_ease import \
     ConfigWithEase
 
 from hythe.libs.blueprint.blueprint import HyHighwayDiscreteBlueprint

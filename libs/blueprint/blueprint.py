@@ -1,9 +1,9 @@
-from bark_project.modules.runtime.commons.parameters import ParameterServer
-from bark_project.modules.runtime.viewer.matplotlib_viewer import MPViewer
+from bark_project.bark.runtime.commons.parameters import ParameterServer
+from bark_project.bark.runtime.viewer.matplotlib_viewer import MPViewer
 
 from bark_ml.environments.blueprints.highway.highway import HighwayLaneCorridorConfig
 from bark_ml.environments.blueprints.blueprint import Blueprint
-from bark_project.modules.runtime.scenario.scenario_generation.config_with_ease import \
+from bark_project.bark.runtime.scenario.scenario_generation.config_with_ease import \
     LaneCorridorConfig, ConfigWithEase
 
 from bark_ml.evaluators.goal_reached import GoalReached

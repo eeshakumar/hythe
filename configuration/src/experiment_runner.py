@@ -3,11 +3,12 @@ import os
 from pathlib import Path
 from datetime import datetime
 import yaml
+import time
 from hythe.libs.experiments.experiment import Experiment
 from hythe.libs.environments.gym import HyDiscreteHighway
 
 from fqf_iqn_qrdqn.agent import FQFAgent
-from bark_project.modules.runtime.commons.parameters import ParameterServer
+from bark_project.bark.runtime.commons.parameters import ParameterServer
 
 from bark_ml.evaluators.goal_reached_guiding import GoalReachedGuiding
 from bark_ml.evaluators.goal_reached import GoalReached
@@ -90,10 +91,11 @@ def main():
     # import gym
     # env = gym.make("highway-v1")
     env.reset()
-    actions = [0, 1, 2, 3, 4, 5, 6, 7]
+    actions = [5]*100
     print(actions)
     for action in actions:
         env.step(action)
+        time.sleep(0.2)
     return
 
 
