@@ -2,8 +2,8 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
 def _maybe(repo_rule, name, **kwargs):
-    # if name not in native.existing_rules():
-    repo_rule(name = name, **kwargs)
+    if name not in native.existing_rules():
+        repo_rule(name = name, **kwargs)
 
 def hythe_deps():
     _maybe(
@@ -21,7 +21,8 @@ def hythe_deps():
         #        native.local_repository,
         name = "bark_project",
         #        path = "/home/ekumar/master_thesis/code/bark",
-        branch = "master",
+        #        branch = "master",
+        commit = "6e1080ed07f9a47973e553c78697910c90b84bf2",
         remote = "https://github.com/eeshakumar/bark",
     )
 
