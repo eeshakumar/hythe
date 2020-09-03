@@ -81,7 +81,19 @@ def main():
                             evaluator=evaluator, observer=observer,
                             map_filename=params["Experiment"]["map_filename"])
 
-    run(params, env)
+    # run(params, env)
+    # from gym.envs.registration import register
+    # register(
+    #     id='highway-v1',
+    #     entry_point='bark_ml.environments.gym:DiscreteHighwayGym'
+    # )
+    # import gym
+    # env = gym.make("highway-v1")
+    env.reset()
+    actions = [0, 1, 2, 3, 4, 5, 6, 7]
+    print(actions)
+    for action in actions:
+        env.step(action)
     return
 
 
