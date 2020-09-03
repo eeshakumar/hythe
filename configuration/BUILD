@@ -83,6 +83,7 @@ py_binary(
         "//configuration/params:hy_params",
         "@bark_ml_project//bark_ml:generate_core",
         "@bark_project//bark:generate_core",
+        '//configuration/database:database',
         "@fqn//:fqn_config",
     ],
     imports = [
@@ -94,6 +95,8 @@ py_binary(
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
+        "@benchmark_database//load:benchmark_database",
+        "@benchmark_database//serialization:database_serializer",
         "@bark_project//bark/runtime/viewer:py_viewer",
         "@fqn//:pylib_fqn",
         "@hythe//libs/blueprint",

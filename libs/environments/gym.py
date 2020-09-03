@@ -47,6 +47,10 @@ class HyDiscreteIntersection(SingleAgentRuntime, gym.Wrapper):
         self._blueprint = DiscreteIntersectionBlueprint(params)
         SingleAgentRuntime.__init__(self, blueprint=self._blueprint, render=True)
 
+class GymSingleAgentRuntime(SingleAgentRuntime, gym.Wrapper):
+    def __init__(self, *args, **kwargs):
+        SingleAgentRuntime.__init__(self, *args, **kwargs)
+
 
 # register gym envs
 

@@ -5,7 +5,8 @@ from datetime import datetime
 import yaml
 import time
 from hythe.libs.experiments.experiment import Experiment
-from hythe.libs.environments.gym import HyDiscreteHighway
+from bark.runtime.viewer.matplotlib_viewer import MPViewer
+from hythe.libs.environments.gym import HyDiscreteHighway, GymSingleAgentRuntime
 
 from fqf_iqn_qrdqn.agent import FQFAgent
 from bark_project.bark.runtime.commons.parameters import ParameterServer
@@ -16,6 +17,8 @@ from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
+from load.benchmark_database import BenchmarkDatabase
+from serialization.database_serializer import DatabaseSerializer
 
 def configure_args(parser=None):
     if parser is None:
@@ -77,10 +80,25 @@ def main():
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReachedGuiding(params)
     observer = NearestAgentsObserver(params)
-    env = HyDiscreteHighway(params=params, num_scenarios=num_scenarios,
-                            random_seed=random_seed, behavior=behavior,
-                            evaluator=evaluator, observer=observer,
-                            map_filename=params["Experiment"]["map_filename"])
+    viewer = MPViewer(params=params,
+                        x_range=[-35, 35],
+                        y_range=[-35, 35],
+                        follow_agent_id=True)
+
+    # database creation 
+    dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2, num_serialize_scenarios=20) # increase the number of serialize scenarios to 100
+    dbs.process("configuration/database")
+    local_release_filename = dbs.release(version="test")
+    db = BenchmarkDatabase(database_root=local_release_filename)
+    scenario_generator, _, _ = db.get_scenario_generation(0)
+
+    env = GymSingleAgentRuntime(ml_behavior = behavior,
+                                observer = observer,
+                                evaluator = evaluator,
+                                step_time=0.2,
+                                viewer=viewer,
+                                scenario_generator=scenario_generator,
+                                render)
 
     # run(params, env)
     # from gym.envs.registration import register
@@ -91,7 +109,7 @@ def main():
     # import gym
     # env = gym.make("highway-v1")
     env.reset()
-    actions = [5]*100
+    actions = [7]*100
     print(actions)
     for action in actions:
         env.step(action)
