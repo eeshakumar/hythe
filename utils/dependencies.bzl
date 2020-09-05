@@ -18,7 +18,8 @@ cc_library(
     includes = ["include/python3.6m", "include", "include/python3.7m", "include/python3.5m"], 
     visibility = ["//visibility:public"],
 )
-        """)
+        """,
+    )
 
     _maybe(
         #        native.local_repository,
@@ -58,8 +59,11 @@ cc_library(
     )
 
     _maybe(
-        git_repository,
+        #        git_repository,
+        native.local_repository,
         name = "planner_uct",
-        commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
-        remote = "https://github.com/juloberno/bark_hypothesis_uct",
+        #        branch = "risk_calculation_integration",
+        #                commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
+        #        remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
+        path = "/home/ekumar/master_thesis/code/bark_hypothesis_uct",
     )
