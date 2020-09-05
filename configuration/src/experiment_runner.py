@@ -28,8 +28,8 @@ def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
     parser.add_argument(
-        '--config', type=str, default=os.path.join('external/fqn/config', 'fqf.yaml'))
-    parser.add_argument('--env_id', type=str, default='hyhighway-v0')
+        '--config', type=str, default=os.path.join('hy-exp-run.runfiles/fqn/config', 'fqf.yaml'))
+    parser.add_argument('--env_id', type=str, default='hy-highway-v0')
     parser.add_argument('--cuda', action='store_true', default=True)
     parser.add_argument('--seed', type=int, default=122)
     return parser.parse_args()
@@ -54,11 +54,11 @@ def configure_params(params):
     import uuid
     experiment_seed = str(uuid.uuid4())
     params["Experiment"]["random_seed"] = experiment_seed
-    params["Experiment"]["dir"] = str(Path.home().joinpath(".cache/output/experiments/exp_{}".format(experiment_seed)))
+    params["Experiment"]["dir"] = str(Path.home().joinpath("output/experiments/exp_{}".format(experiment_seed)))
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 100
+    params["Experiment"]["num_episodes"] = 100000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -77,7 +77,7 @@ def run(params, env):
 
 def main():
     print("Experiment server at:", os.getcwd())
-    params = ParameterServer(filename="configuration/params/default_exp_runne_params.json")
+    params = ParameterServer(filename="hy-exp-run.runfiles/hythe/configuration/params/default_exp_runne_params.json")
     params = configure_params(params)
     num_scenarios = 5
     random_seed = 0
@@ -88,26 +88,36 @@ def main():
                         x_range=[-35, 35],
                         y_range=[-35, 35],
                         follow_agent_id=True)
-    params.Save(filename="./default_exp_runne_params.json")
+    experiment_id = params["Experiment"]["random_seed"]
+    params_filename = "./{}_default_exp_runner_params.json".format(experiment_id)
+    params.Save(filename=params_filename)
     # database creation 
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2, num_serialize_scenarios=20) # increase the number of serialize scenarios to 100
-    dbs.process("configuration/database")
-    local_release_filename = dbs.release(version="test")
+    dbs.process("hy-exp-run.runfiles/hythe/configuration/database")
+    local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
     db = BenchmarkDatabase(database_root=local_release_filename)
 
     # switch this to other generator to get other index
-    scenario_generator, _, _ = db.get_scenario_generator(0)
-    #scenario_generator, _, _ = db.get_scenario_generator(1)
+    # scenario_generator, _, _ = db.get_scenario_generator(0)
+    scenario_generator, _, _ = db.get_scenario_generator(1)
+    #
+    # env = GymSingleAgentRuntime(ml_behavior = behavior,
+    #                             observer = observer,
+    #                             evaluator = evaluator,
+    #                             step_time=0.2,
+    #                             viewer=viewer,
+    #                             scenario_generator=scenario_generator,
+    #                             render=True)
 
-    env = GymSingleAgentRuntime(ml_behavior = behavior,
-                                observer = observer,
-                                evaluator = evaluator,
-                                step_time=0.2,
-                                viewer=viewer,
-                                scenario_generator=scenario_generator,
-                                render=True)
+    env = HyDiscreteHighway(params=params,
+                            scenario_generation=scenario_generator,
+                            behavior=behavior,
+                            evaluator=evaluator,
+                            observer=observer,
+                            viewer=True,
+                            render=False)
 
-    # run(params, env)
+    run(params, env)
     # from gym.envs.registration import register
     # register(
     #     id='highway-v1',
@@ -115,12 +125,12 @@ def main():
     # )
     # import gym
     # env = gym.make("highway-v1")
-    env.reset()
-    actions = [5]*100
-    print(actions)
-    for action in actions:
-        env.step(action)
-        time.sleep(0.2)
+    # env.reset()
+    # actions = [5]*100
+    # print(actions)
+    # for action in actions:
+    #     env.step(action)
+    #     time.sleep(0.2)
     return
 
 
