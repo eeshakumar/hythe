@@ -14,7 +14,7 @@ class HyDiscreteHighway(SingleAgentRuntime, gym.Env):
 
     def __init__(self, params=None, num_scenarios=25, random_seed=0, viewer=True,
                  behavior=None, evaluator=None, observer=None, scenario_generation=None,
-                 map_filename=None, blueprint=None):
+                 map_filename=None, blueprint=None, render=True):
         if blueprint is None:
             self._blueprint = HyHighwayDiscreteBlueprint(params=params,
                                                          map_filename=map_filename,
@@ -27,7 +27,7 @@ class HyDiscreteHighway(SingleAgentRuntime, gym.Env):
                                                          viewer=viewer)
         else:
             self._blueprint = blueprint
-        SingleAgentRuntime.__init__(self, blueprint=self._blueprint, render=True)
+        SingleAgentRuntime.__init__(self, blueprint=self._blueprint, render=render)
 
     @property
     def blueprint(self):
@@ -55,7 +55,7 @@ class GymSingleAgentRuntime(SingleAgentRuntime, gym.Wrapper):
 # register gym envs
 
 register(
-    id="hyhighway-v0",
+    id="hy-highway-v0",
     entry_point="hythe.modules.environments.gym:HyDiscreteHighway"
 )
 
