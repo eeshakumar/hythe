@@ -1,3 +1,4 @@
+import logging
 from os import path, listdir
 from json import load as json_load
 import glob
@@ -12,12 +13,13 @@ from hythe.libs.environments.gym import HyDiscreteHighway
 
 class Experiment(object):
 
-    def __init__(self, params, agent, scenario_generation=None):
+    def __init__(self, params, agent, dump_scenario_interval=1000, scenario_generation=None):
         self._agent = agent
         self._env = agent.env
         self._blueprint = self._env.blueprint
         self._scenario_generation = self._blueprint.scenario_generation
         self._params = params
+        self._dump_scenarios_interval = dump_scenario_interval
         self.init_params(params)
 
     def init_params(self, params):
@@ -47,12 +49,18 @@ class Experiment(object):
 
     def save(self, episode_num):
         try:
-            if episode_num % 1000 == 0:
+            if episode_num % self._dump_scenarios_interval == 0:
+                logging.info('-' * 60)
                 scenarios_filename, params_filename = self.update_filenames(episode_num=episode_num)
+                logging.info("Writing scenarios to :{}".format(scenarios_filename))
+                logging.info('-' * 60)
+                # logging.info("Writing params to :{}".format(scenarios_filename))
+                # logging.info('-' * 60)
+
                 self._blueprint.scenario_generation.dump_scenario_list(scenarios_filename)
 
                 # self._blueprint.scenario_generation.params.Save(params_filename)
-                self._agent.save_models(self.dir)
+                # self._agent.save_models(self.dir)
         except TypeError or IOError as error:
             print("Could not save experiment:", error)
 

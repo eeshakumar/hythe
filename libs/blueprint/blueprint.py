@@ -10,6 +10,7 @@ from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
+from bark.runtime.viewer.video_renderer import VideoRenderer
 
 class HyHighwayBlueprint(Blueprint):
 
@@ -44,11 +45,7 @@ class HyHighwayBlueprint(Blueprint):
                 lane_corridor_configs=[left_lane, right_lane]
             )
 
-        if viewer:
-            viewer = MPViewer(params=params,
-                              x_range=[-35, 35],
-                              y_range=[-35, 35],
-                              follow_agent_id=True)
+        viewer = VideoRenderer(renderer=viewer, world_step_time=0.1)
 
         dt = 0.1
 
