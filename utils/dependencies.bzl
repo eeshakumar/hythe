@@ -23,22 +23,21 @@ cc_library(
 
     _maybe(
         #        native.local_repository,
-        git_repository,
+        native.local_repository,
         name = "bark_ml_project",
-        commit = "5d81994712ccb6eb73da7420bf487110ed16ebeb",
-        remote = "https://github.com/bark-simulator/bark-ml",
-        #        path = "/home/ekumar/master_thesis/code/bark-ml",
-        #repo_mapping = {"@bark_ml": "@bark_ml//bark_ml"}
+        #        commit = "5d81994712ccb6eb73da7420bf487110ed16ebeb",
+        #        remote = "https://github.com/bark-simulator/bark-ml",
+        path = "/home/ekumar/master_thesis/code/bark-ml",
     )
 
     _maybe(
-        git_repository,
-        #        native.local_repository,
+        #        git_repository,
+        native.local_repository,
         name = "bark_project",
-        #        path = "/home/ekumar/master_thesis/code/bark",
-        #        branch = "master",
-        commit = "bef1805be75287584ac8bea7aa777df36bdf5d26",
-        remote = "https://github.com/bark-simulator/bark",
+        path = "/home/ekumar/master_thesis/code/bark-drl",
+        #        branch = "jb_bark_adaptations",
+        #        commit = "5e2ce8893e21f7236ee7c43351e61c0bce28a057",
+        #        remote = "https://github.com/eeshakumar/bark-drl",
     )
 
     _maybe(
@@ -50,11 +49,12 @@ cc_library(
     )
 
     _maybe(
-        new_git_repository,
+        #        new_git_repository,
+        native.new_local_repository,
         name = "fqn",
-        branch = "master",
-        remote = "https://github.com/eeshakumar/fqf-iqn-qrdqn.pytorch",
-        #path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
+        #        branch = "master",
+        #        remote = "https://github.com/eeshakumar/fqf-iqn-qrdqn.pytorch",
+        path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
         build_file = "//:utils/BUILD.fqn",
     )
 
