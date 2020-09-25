@@ -24,6 +24,7 @@ from bark.runtime.scenario.scenario_generation.configurable_scenario_generation 
   import add_config_reader_module
 add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
+
 def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
@@ -45,6 +46,7 @@ def configure_agent(env):
     time = datetime.now().strftime("%Y%m%d-%H%M")
     log_dir = os.path.join(
         'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
+    print('Loggind at', log_dir)
     agent = FQFAgent(env=env, test_env=env, log_dir=log_dir, seed=args.seed,
                      cuda=args.cuda, **config)
     return agent
@@ -82,7 +84,8 @@ def main():
     num_scenarios = 5
     random_seed = 0
     behavior = BehaviorDiscreteMacroActionsML(params)
-    evaluator = GoalReachedGuiding(params)
+    # evaluator = GoalReachedGuiding(params)
+    evaluator = GoalReached(params)
     observer = NearestAgentsObserver(params)
     viewer = MPViewer(params=params,
                         x_range=[-35, 35],
@@ -90,6 +93,7 @@ def main():
                         follow_agent_id=True)
     experiment_id = params["Experiment"]["random_seed"]
     params_filename = "./{}_default_exp_runner_params.json".format(experiment_id)
+    print(params_filename)
     params.Save(filename=params_filename)
     # database creation 
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2, num_serialize_scenarios=20) # increase the number of serialize scenarios to 100
@@ -107,17 +111,19 @@ def main():
     #                             step_time=0.2,
     #                             viewer=viewer,
     #                             scenario_generator=scenario_generator,
-    #                             render=True)
+    #                             render=False)
 
     env = HyDiscreteHighway(params=params,
                             scenario_generation=scenario_generator,
                             behavior=behavior,
                             evaluator=evaluator,
                             observer=observer,
-                            viewer=True,
+                            viewer=viewer,
                             render=False)
 
     run(params, env)
+    # video_renderer.drawWorld(env._world)
+    env._viewer.export_video("./test_video")
     # from gym.envs.registration import register
     # register(
     #     id='highway-v1',
