@@ -38,7 +38,8 @@ class RemoteDispatcher(Dispatcher):
             stdin, stdout, stderr = self._ssh_client.exec_command("cd {};".format(exec_path) + cmd)
         else:
             stdin, stdout, stderr = self._ssh_client.exec_command(cmd)
-        print(stdout.readlines())
+        print("Std out o/p:", stdout.readlines())
+        print("Std err o/p:", stderr.readlines())
         return
 
     def close(self):

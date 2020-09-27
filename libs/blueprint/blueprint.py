@@ -1,15 +1,16 @@
-from bark_project.modules.runtime.commons.parameters import ParameterServer
-from bark_project.modules.runtime.viewer.matplotlib_viewer import MPViewer
+from bark_project.bark.runtime.commons.parameters import ParameterServer
+from bark_project.bark.runtime.viewer.matplotlib_viewer import MPViewer
 
 from bark_ml.environments.blueprints.highway.highway import HighwayLaneCorridorConfig
 from bark_ml.environments.blueprints.blueprint import Blueprint
-from bark_project.modules.runtime.scenario.scenario_generation.config_with_ease import \
+from bark_project.bark.runtime.scenario.scenario_generation.config_with_ease import \
     LaneCorridorConfig, ConfigWithEase
 
 from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
+from bark.runtime.viewer.video_renderer import VideoRenderer
 
 class HyHighwayBlueprint(Blueprint):
 
@@ -44,11 +45,7 @@ class HyHighwayBlueprint(Blueprint):
                 lane_corridor_configs=[left_lane, right_lane]
             )
 
-        if viewer:
-            viewer = MPViewer(params=params,
-                              x_range=[-35, 35],
-                              y_range=[-35, 35],
-                              follow_agent_id=True)
+        viewer = VideoRenderer(renderer=viewer, world_step_time=0.1)
 
         dt = 0.1
 

@@ -1,0 +1,149 @@
+{
+    "Experiment": {
+        "random_seed": "6ce24214-ffdf-43cc-8c85-8bcf85fd6334",
+        "dir": "/home/julo/.cache/output/experiments/exp_6ce24214-ffdf-43cc-8c85-8bcf85fd6334",
+        "params": "params_{}_{}.json",
+        "scenarios_generated": "scenarios_list_{}_{}",
+        "num_episodes": 100,
+        "map_filename": "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
+    },
+    "ML": {
+        "BehaviorMPMacroActions": {
+            "BehaviorMPMacroActions": {
+                "CheckValidityInPlan": false
+            },
+            "BehaviorMotionPrimitives": {
+                "IntegrationTimeDelta": 0.019999999552965164
+            },
+            "AccelerationInputs": [
+                0.0,
+                1.0,
+                4.0,
+                -1.0,
+                -5.0
+            ],
+            "BehaviorIDMClassic": {
+                "MinimumSpacing": 2.0,
+                "DesiredTimeHeadway": 1.5,
+                "MaxAcceleration": 1.7000000476837158,
+                "AccelerationLowerBound": -5.0,
+                "AccelerationUpperBound": 8.0,
+                "DesiredVelocity": 15.0,
+                "ComfortableBrakingAcceleration": 1.6699999570846558,
+                "MinVelocity": 0.0,
+                "MaxVelocity": 50.0,
+                "Exponent": 4,
+                "BrakeForLaneEnd": false,
+                "BrakeForLaneEndEnabledDistance": 60.0,
+                "BrakeForLaneEndDistanceOffset": 15.0,
+                "NumTrajectoryTimePoints": 11,
+                "CoolnessFactor": 0.0
+            },
+            "BehaviorIDMLaneTracking": {
+                "CrosstrackErrorGain": 4.0
+            },
+            "PrimitiveConstAccStayLane": {
+                "Acceleration": 0.0
+            },
+            "MinLength": 0.2
+        },
+        "GoalReachedGuiding": {
+            "GoalReward": 1.0,
+            "CollisionPenalty": -1.0,
+            "MaxSteps": 50,
+            "ActionPenalty": 0.01,
+            "GoalDistance": 0.01
+        },
+        "StateObserver": {
+            "VelocityRange": [
+                0,
+                100
+            ],
+            "ThetaRange": [
+                0,
+                6.283185307179586
+            ],
+            "NormalizationEnabled": true,
+            "MaxNumAgents": 4
+        },
+        "NearestAgentsObserver": {
+            "MaxOtherDistance": 100
+        }
+    },
+    "Visualization": {
+        "Agents": {
+            "Color": {
+                "Other": {
+                    "Lines": [
+                        0.1,
+                        0.1,
+                        0.1
+                    ],
+                    "Face": [
+                        0.7,
+                        0.7,
+                        0.7
+                    ]
+                },
+                "Controlled": {
+                    "Lines": [
+                        0.9,
+                        0,
+                        0
+                    ],
+                    "Face": [
+                        0.9,
+                        0,
+                        0
+                    ]
+                },
+                "UseColormapForOtherAgents": false,
+                "IfColormapUseLineColorOthers": true
+            },
+            "Alpha": {
+                "Controlled": 0.8,
+                "Other": 1
+            },
+            "ColorRoute": [
+                0.2,
+                0.2,
+                0.2
+            ],
+            "DrawRoute": false,
+            "DrawAgentId": true,
+            "DrawEvalGoals": true,
+            "EvalGoalColor": [
+                0.49,
+                0.63,
+                0.83
+            ],
+            "DrawHistory": false,
+            "DrawHistoryDrawFace": true
+        },
+        "Map": {
+            "XodrLanes": {
+                "Boundaries": {
+                    "Color": [
+                        0.7,
+                        0.7,
+                        0.7
+                    ],
+                    "Alpha": 1.0,
+                    "Linewidth": 1.0
+                }
+            },
+            "Plane": {
+                "Color": [
+                    1,
+                    1,
+                    1,
+                    1
+                ],
+                "Alpha": 1.0
+            }
+        },
+        "Evaluation": {
+            "DrawLTLDebugInfo": false
+        }
+    }
+}
