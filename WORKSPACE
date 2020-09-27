@@ -9,6 +9,10 @@ load("@bark_ml_project//utils:dependencies.bzl", "bark_ml_dependencies")
 
 bark_ml_dependencies()
 
+load("@planner_uct//util:deps.bzl", "planner_uct_rules_dependencies")
+
+planner_uct_rules_dependencies()
+
 load("@bark_project//tools:deps.bzl", "bark_dependencies")
 
 bark_dependencies()

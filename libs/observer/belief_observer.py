@@ -6,6 +6,7 @@ import numpy as np
 from collections import OrderedDict
 # from bark_mcts.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
+from bark.core.world import World, MakeTestWorldHighway, ObservedWorld
 from bark.core.models.behavior import *
 
 
@@ -18,10 +19,17 @@ class BeliefObserver(NearestAgentsObserver):
         :param splits: number of splits or partitions generated for scenario behaviours.
         """
         super(BeliefObserver, self).__init__(params)
+        self.params = params
         self.hypothesis_set = hypothesis_set
         self.splits = splits
         self.belief_calculator = BeliefCalculator(params, hypothesis_set)
         self.beliefs = self.belief_calculator.GetBeliefs()
+        # world = MakeTestWorldHighway()
+        # agent_id_list = list(world.agents.keys())
+        # observed_world = ObservedWorld(world, agent_id_list[0])
+        # self.belief_calculator.BeliefUpdate(observed_world)
+        # self.beliefs = self.belief_calculator.GetBeliefs()
+        self.beliefs = None
 
     def Reset(self, world):
         """
@@ -29,9 +37,9 @@ class BeliefObserver(NearestAgentsObserver):
         :param world:
         :return:
         """
-        super().Reset(world)
-        self.belief_calculator = BeliefCalculator(hypothesis_set)
-        return
+        world = super().Reset(world)
+        self.belief_calculator = BeliefCalculator(self.params, self.hypothesis_set)
+        return world
 
     def Observe(self, world):
         """
@@ -39,12 +47,13 @@ class BeliefObserver(NearestAgentsObserver):
         :param world: Observed world.
         :return: Concatenated state with beliefs.
         """
-        concatenated_state, agent_ids_by_nearest = super(BeliefObserver, self).Observe(world)
-        self.belief_calculator = self.belief_calculator.BeliefUpdate(world)
+        concatenated_state, agent_ids_by_nearest = super(BeliefObserver, self).Observe(
+            world, is_ret_agent_idx_nearest=True)
+        self.belief_calculator.BeliefUpdate(world)
         # beliefs is a dictionary mapping every agent id to list of beliefs.
         # the agent ids are ordered by distance.
-        beliefs = self.belief_calculator.GetBeliefs()
-        self.beliefs = BeliefObserver.order_beliefs(agent_ids_by_nearest)
+        self.beliefs = self.belief_calculator.GetBeliefs()
+        self.beliefs = self.order_beliefs(agent_ids_by_nearest)
         len_beliefs, beliefs_arr = self.beliefs_array()
         beliefs_concatenated_state = np.zeros(concatenated_state.shape[0] + len_beliefs)
         beliefs_concatenated_state = np.concatenate([concatenated_state, beliefs_arr])
@@ -70,6 +79,6 @@ class BeliefObserver(NearestAgentsObserver):
         :param agent_ids_by_nearest:
         :return:
         """
-        ordered_beliefs = OrderedDict({agent_id:self.beliefs[agent_id] for agent_id in agent_ids_by_nearest})
+        ordered_beliefs = OrderedDict({agent_id: self.beliefs[agent_id] for agent_id in agent_ids_by_nearest})
         return ordered_beliefs
 

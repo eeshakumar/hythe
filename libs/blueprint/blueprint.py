@@ -1,14 +1,14 @@
-from bark_project.bark.runtime.commons.parameters import ParameterServer
-from bark_project.bark.runtime.viewer.matplotlib_viewer import MPViewer
+from bark.runtime.commons.parameters import ParameterServer
+from bark.runtime.viewer.matplotlib_viewer import MPViewer
 
 from bark_ml.environments.blueprints.highway.highway import HighwayLaneCorridorConfig
 from bark_ml.environments.blueprints.blueprint import Blueprint
-from bark_project.bark.runtime.scenario.scenario_generation.config_with_ease import \
+from bark.runtime.scenario.scenario_generation.config_with_ease import \
     LaneCorridorConfig, ConfigWithEase
 
 from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
-from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
+from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteML
 
 from bark.runtime.viewer.video_renderer import VideoRenderer
 
@@ -23,7 +23,7 @@ class HyHighwayBlueprint(Blueprint):
                  evaluator=None,
                  observer=None,
                  scenario_generation=None,
-                 viewer=True):
+                 viewer=False):
         if scenario_generation is None:
             left_lane = HighwayLaneCorridorConfig(params=params,
                                                   road_ids=[16],
@@ -45,7 +45,11 @@ class HyHighwayBlueprint(Blueprint):
                 lane_corridor_configs=[left_lane, right_lane]
             )
 
-        viewer = VideoRenderer(renderer=viewer, world_step_time=0.1)
+        if viewer:
+            viewer = MPViewer(params=params,
+                              x_range=[-35, 35],
+                              y_range=[-35, 35],
+                              follow_agent_id=True)
 
         dt = 0.1
 
@@ -71,7 +75,7 @@ class HyHighwayDiscreteBlueprint(HyHighwayBlueprint):
                  scenario_generation=None,
                  viewer=True):
         if behavior is None:
-            behavior = BehaviorDiscreteMacroActionsML(params)
+            behavior = BehaviorDiscreteML(params)
 
         if evaluator is None:
             evaluator = GoalReached(params)

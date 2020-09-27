@@ -3,6 +3,8 @@ import os
 from argparse import ArgumentParser
 from pathlib import Path
 
+import bark.core
+import bark.core.models.behavior
 from bark.runtime.commons.parameters import ParameterServer
 
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
@@ -11,6 +13,8 @@ from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 import yaml
 from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
+from bark.runtime.scenario.scenario_generation.configurable_scenario_generation \
+  import ConfigurableScenarioGeneration
 
 from hythe.libs.experiments.experiment import Experiment
 from hythe.libs.environments.gym import HyDiscreteHighway
@@ -25,6 +29,14 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
 
 is_local=True
+
+def load_behavior_sampling_params(params):
+    with open("configuration/params/default_params_sampling.json", "rb+") as f:
+        params_json = json.loads(f.read())
+        params["Scenario"]["Generation"]["ConfigurableScenarioGeneration"] = \
+            params_json["Scenario"]["Generation"]["ConfigurableScenarioGeneration"]
+        print(params["Scenario"]["Generation"]["ConfigurableScenarioGeneration"]["MapFilename"])
+        return params
 
 
 def configure_args(parser=None):
@@ -71,8 +83,10 @@ def configure_params(params):
     return params
 
 
-def configure_scenario_generation():
-    return
+def configure_scenario_generation(num_scenarios, params):
+    scenario_generation = ConfigurableScenarioGeneration(num_scenarios=num_scenarios,
+                                                         params=params)
+    return scenario_generation
 
 
 def run(params, env):
@@ -128,6 +142,7 @@ def main():
                             render=False)
 
     run(params, env)
+    return
 
 
 if __name__ == '__main__':
