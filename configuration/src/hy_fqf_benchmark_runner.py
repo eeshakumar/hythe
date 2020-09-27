@@ -84,7 +84,7 @@ def main():
     else:
         dir_prefix="hy-fqf-exp.runfiles/hythe/"
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_epsilon_train_eval.json"))
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params.json"))
     params = configure_params(params)
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -96,9 +96,8 @@ def main():
 
     # estract params and save experiment parameters
     experiment_id = params["Experiment"]["random_seed"]
-    if is_local:
-        params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
-        params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
+    params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
+    params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
 
     params.Save(filename=params_filename)
