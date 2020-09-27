@@ -5,10 +5,6 @@ load("//utils:dependencies.bzl", "hythe_deps")
 
 hythe_deps()
 
-load("@bark_hypothesis_uct_project//util:deps.bzl", "planner_uct_rules_dependencies")
-
-planner_uct_rules_dependencies()
-
 load("@bark_ml_project//utils:dependencies.bzl", "bark_ml_dependencies")
 
 bark_ml_dependencies()

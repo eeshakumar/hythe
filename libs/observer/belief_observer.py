@@ -6,6 +6,7 @@ import numpy as np
 from collections import OrderedDict
 # from bark_mcts.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
+from bark.core.models.behavior import *
 
 
 class BeliefObserver(NearestAgentsObserver):
@@ -20,7 +21,7 @@ class BeliefObserver(NearestAgentsObserver):
         self.hypothesis_set = hypothesis_set
         self.splits = splits
         self.belief_calculator = BeliefCalculator(params, hypothesis_set)
-        self.beliefs = self.belief_calculator.get_beliefs()
+        self.beliefs = self.belief_calculator.GetBeliefs()
 
     def Reset(self, world):
         """

@@ -5,7 +5,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@bark_hypothesis_uct_project//bark_mcts/models/behavior/belief_calculator",
         "@bark_ml_project//bark_ml/observers",
+        #        "@planner_uct//bark_mcts/models/behavior/belief_calculator",
     ],
 )
