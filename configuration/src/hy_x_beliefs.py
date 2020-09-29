@@ -30,14 +30,6 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
 is_local=True
 
-def load_behavior_sampling_params(params):
-    with open("configuration/params/default_params_sampling.json", "rb+") as f:
-        params_json = json.loads(f.read())
-        params["Scenario"]["Generation"]["ConfigurableScenarioGeneration"] = \
-            params_json["Scenario"]["Generation"]["ConfigurableScenarioGeneration"]
-        print(params["Scenario"]["Generation"]["ConfigurableScenarioGeneration"]["MapFilename"])
-        return params
-
 
 def configure_args(parser=None):
     if parser is None:
@@ -90,7 +82,7 @@ def configure_scenario_generation(num_scenarios, params):
 
 
 def run(params, env):
-    agent = configure_agent(env)
+    agent, _ = configure_agent(params, env)
     exp = Experiment(params=params, agent=agent)
     exp.run()
 
@@ -104,15 +96,22 @@ def main():
     params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params.json"))
     params = configure_params(params)
     experiment_id = params["Experiment"]["random_seed"]
+    params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
+    params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
+    params.Save(filename=params_filename)
+    logging.info('-' * 60)
+    logging.info("Writing params to :{}".format(params_filename))
+    logging.info('-' * 60)
 
     # configure belief observer
     splits = 2
-    behavior_space = configure_behavior_space(params)
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/default_params_behavior_space.json"))
+    behavior_space = configure_behavior_space(params_behavior)
+
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
     observer = BeliefObserver(params, hypothesis_set, splits=splits)
-
-    behavior = BehaviorDiscreteMacroActionsML(params)
+    behavior = BehaviorDiscreteMacroActionsML(params_behavior)
     evaluator = GoalReached(params)
 
     viewer = MPViewer(params=params,
@@ -120,19 +119,14 @@ def main():
                       y_range=[-35, 35],
                       follow_agent_id=True)
 
-    params.Save(filename=params_filename)
-    logging.info('-' * 60)
-    logging.info("Writing params to :{}".format(params_filename))
-    logging.info('-' * 60)
 
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                              num_serialize_scenarios=100)
-    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense")
+    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense_behavior_space_default")
     local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
     db = BenchmarkDatabase(database_root=local_release_filename)
     scenario_generator, _, _ = db.get_scenario_generator(0)
-
     env = HyDiscreteHighway(params=params,
                             scenario_generation=scenario_generator,
                             behavior=behavior,

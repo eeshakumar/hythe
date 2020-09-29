@@ -3,6 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import numpy as np
+from gym import spaces
 from collections import OrderedDict
 # from bark_mcts.models.behavior.belief_calculator.belief_calculator import BeliefCalculator
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
@@ -23,13 +24,8 @@ class BeliefObserver(NearestAgentsObserver):
         self.hypothesis_set = hypothesis_set
         self.splits = splits
         self.belief_calculator = BeliefCalculator(params, hypothesis_set)
-        self.beliefs = self.belief_calculator.GetBeliefs()
-        # world = MakeTestWorldHighway()
-        # agent_id_list = list(world.agents.keys())
-        # observed_world = ObservedWorld(world, agent_id_list[0])
-        # self.belief_calculator.BeliefUpdate(observed_world)
-        # self.beliefs = self.belief_calculator.GetBeliefs()
         self.beliefs = None
+        self.len_beliefs = self._max_num_vehicles * len(hypothesis_set)
 
     def Reset(self, world):
         """
@@ -43,7 +39,7 @@ class BeliefObserver(NearestAgentsObserver):
 
     def Observe(self, world):
         """
-        Transform from world state to networs input state.
+        Transform from world state to network's input state.
         :param world: Observed world.
         :return: Concatenated state with beliefs.
         """
@@ -52,10 +48,10 @@ class BeliefObserver(NearestAgentsObserver):
         self.belief_calculator.BeliefUpdate(world)
         # beliefs is a dictionary mapping every agent id to list of beliefs.
         # the agent ids are ordered by distance.
-        self.beliefs = self.belief_calculator.GetBeliefs()
-        self.beliefs = self.order_beliefs(agent_ids_by_nearest)
+        beliefs = self.belief_calculator.GetBeliefs()
+        self.beliefs = self.order_beliefs(beliefs, agent_ids_by_nearest)
         len_beliefs, beliefs_arr = self.beliefs_array()
-        beliefs_concatenated_state = np.zeros(concatenated_state.shape[0] + len_beliefs)
+        assert len_beliefs == self.len_beliefs
         beliefs_concatenated_state = np.concatenate([concatenated_state, beliefs_arr])
         return beliefs_concatenated_state
 
@@ -64,21 +60,27 @@ class BeliefObserver(NearestAgentsObserver):
         Helper to flatten dictionary to lists.
         :return:
         """
-        len_beliefs = 0
         beliefs_list = []
         for k, v in self.beliefs.items():
-            len_beliefs += len(v)
             beliefs_list.extend(v)
-        assert len_beliefs == len(beliefs_list)
-        return len_beliefs, np.asarray(beliefs_list)
+        return len(beliefs_list), np.asarray(beliefs_list)
 
-    def order_beliefs(self, agent_ids_by_nearest):
+    def order_beliefs(self, beliefs, agent_ids_by_nearest):
         """
         Order beliefs based on nearest agent. I.e. the first agent id (key) of ordered_beliefs is the nearest agent.
-        :param beliefs:
-        :param agent_ids_by_nearest:
+        :param beliefs: beliefs as calculated by belief calculator.
+        :param agent_ids_by_nearest: list of agent_ids sorted by distance
         :return:
         """
-        ordered_beliefs = OrderedDict({agent_id: self.beliefs[agent_id] for agent_id in agent_ids_by_nearest})
+        ordered_beliefs = OrderedDict({agent_id: beliefs[agent_id] for agent_id in agent_ids_by_nearest})
         return ordered_beliefs
+
+    @property
+    def observation_space(self):
+        return spaces.Box(
+            low=np.zeros(self.len_beliefs + self._len_ego_state + \
+        self._max_num_vehicles*self._len_relative_agent_state),
+            high=np.zeros(self.len_beliefs + self._len_ego_state + \
+        self._max_num_vehicles*self._len_relative_agent_state)
+        )
 

@@ -8,7 +8,7 @@ from bark.runtime.scenario.scenario_generation.config_with_ease import \
 
 from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
-from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteML
+from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
 from bark.runtime.viewer.video_renderer import VideoRenderer
 
@@ -75,7 +75,7 @@ class HyHighwayDiscreteBlueprint(HyHighwayBlueprint):
                  scenario_generation=None,
                  viewer=True):
         if behavior is None:
-            behavior = BehaviorDiscreteML(params)
+            behavior = BehaviorDiscreteMacroActionsML(params)
 
         if evaluator is None:
             evaluator = GoalReached(params)
