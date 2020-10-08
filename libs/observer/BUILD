@@ -5,7 +5,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//libs/timer",
         "@bark_ml_project//bark_ml/observers",
-        #        "@planner_uct//bark_mcts/models/behavior/belief_calculator",
     ],
 )

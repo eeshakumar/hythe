@@ -11,6 +11,7 @@ from bark.core.world import World, MakeTestWorldHighway, ObservedWorld
 from bark.core.models.behavior import *
 
 
+
 class BeliefObserver(NearestAgentsObserver):
 
     def __init__(self, params, hypothesis_set, splits):
@@ -83,4 +84,12 @@ class BeliefObserver(NearestAgentsObserver):
             high=np.zeros(self.len_beliefs + self._len_ego_state + \
         self._max_num_vehicles*self._len_relative_agent_state)
         )
+
+    @property
+    def max_num_agents(self):
+        return self._max_num_vehicles
+
+    @property
+    def max_beliefs(self):
+        return self.len_beliefs
 
