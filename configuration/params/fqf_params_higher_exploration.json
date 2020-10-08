@@ -52,7 +52,7 @@
             "StartSteps": 5000,
             "EpsilonTrain": 0.1,
             "EpsilonEval": 0.01,
-            "EpsilonDecaySteps": 10000,
+            "EpsilonDecaySteps": 25000,
             "Double_q_learning": true,
             "DuelingNet": false,
             "NoisyNet": false,
