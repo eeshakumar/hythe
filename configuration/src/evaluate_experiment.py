@@ -57,6 +57,8 @@ def main():
     params_filename = glob.glob(os.path.join(exp_dir, "params_*"))
     print(params_filename)
     params = ParameterServer(filename=params_filename[0])
+    # params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
+    # params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
     # params.load(fn=params_filename)
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -80,6 +82,7 @@ def main():
     # # print(agent.online_net.state_dict())
     # # print(agent.online_net.dqn_net.state_dict())
     agent.load_models(exp_dir)
+    # agent.load_models(os.path.join(exp_dir, "agent/checkpoints/final"))
     agent.evaluate()
 
 
