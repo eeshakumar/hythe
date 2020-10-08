@@ -66,7 +66,7 @@ def configure_params(params):
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 10000
+    params["Experiment"]["num_episodes"] = 50000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -84,7 +84,7 @@ def main():
     else:
         dir_prefix="hy-fqf-exp.runfiles/hythe/"
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params.json"))
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_higher_exploration.json"))
     params = configure_params(params)
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)

@@ -28,7 +28,7 @@ from bark.runtime.scenario.scenario_generation.configurable_scenario_generation 
 add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
 
-is_local=True
+is_local=False
 
 
 def configure_args(parser=None):
@@ -70,9 +70,10 @@ def configure_params(params):
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 10
+    params["Experiment"]["num_episodes"] = 50000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
-    return params
+    return params@2020
+
 
 
 def configure_scenario_generation(num_scenarios, params):
@@ -91,9 +92,9 @@ def main():
     if is_local:
         dir_prefix = ""
     else:
-        dir_prefix = "hy-fqf-exp.runfiles/hythe/"
+        dir_prefix = "hy-x-beliefs.runfiles/hythe/"
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params.json"))
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"))
     params = configure_params(params)
     experiment_id = params["Experiment"]["random_seed"]
     params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
@@ -105,7 +106,7 @@ def main():
     logging.info('-' * 60)
 
     # configure belief observer
-    splits = 2
+    splits = 8
     params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/default_params_behavior_space.json"))
     behavior_space = configure_behavior_space(params_behavior)
 
