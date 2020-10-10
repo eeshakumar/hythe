@@ -34,7 +34,7 @@ class HyBeliefObserverTests(unittest.TestCase):
         # params_scenario_generation = ParameterServer(filename="configuration/database/scenario_sets/interaction_merging_light_dense_behavior_space_default.json")
         splits = 8
         params_behavior = ParameterServer(
-            filename="configuration/params/default_params_behavior_space.json")
+            filename="configuration/params/1D_desired_gap_no_prior.json")
         behavior_space = BehaviorSpace(params_behavior)
         hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
         observer = BeliefObserver(params, hypothesis_set, splits=splits)
@@ -50,7 +50,7 @@ class HyBeliefObserverTests(unittest.TestCase):
         dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                                  num_serialize_scenarios=2)
         dbs.process(os.path.join(dir_prefix, "configuration/database"),
-                    filter_sets="interaction_merging_light_dense_behavior_space_default")
+                    filter_sets="interaction_merging_light_dense_1D")
         local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
         db = BenchmarkDatabase(database_root=local_release_filename)
         scenario_generator, _, _ = db.get_scenario_generator(0)
