@@ -67,3 +67,13 @@ cc_library(
         #        remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
         path = "/home/ekumar/master_thesis/code/bark_hypothesis_uct",
     )
+
+    _maybe(
+        #        git_repository,
+        native.local_repository,
+        name = "diadem_project",
+        #        branch = "risk_calculation_integration",
+        #                commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
+        #        remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
+        path = "/home/ekumar/master_thesis/code/diadem",
+    )
