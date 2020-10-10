@@ -72,7 +72,7 @@ def configure_params(params):
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
     params["Experiment"]["num_episodes"] = 50000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
-    return params@2020
+    return params
 
 
 
@@ -107,7 +107,7 @@ def main():
 
     # configure belief observer
     splits = 8
-    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/default_params_behavior_space.json"))
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"))
     behavior_space = configure_behavior_space(params_behavior)
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
@@ -124,7 +124,7 @@ def main():
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                              num_serialize_scenarios=100)
-    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense_behavior_space_default")
+    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense_1D")
     local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
     db = BenchmarkDatabase(database_root=local_release_filename)
     scenario_generator, _, _ = db.get_scenario_generator(0)
