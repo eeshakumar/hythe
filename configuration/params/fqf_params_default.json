@@ -108,6 +108,13 @@
             "Target": false,
             "EmbeddingDims": 512,
             "HiddenDims": 512
+        },
+        "Demonstrator": {
+            "EpsilonAlpha": 0.001,
+            "EpsilonDemo": 1.0,
+            "PerBeta": 0.6,
+            "PerBetaSteps": 25000,
+            "DemoRatio": 1.0
         }
     },
     "agent": {
