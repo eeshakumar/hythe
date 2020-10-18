@@ -28,7 +28,7 @@ from bark.runtime.scenario.scenario_generation.configurable_scenario_generation 
 add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
 
-is_local=False
+is_local = False
 
 
 def configure_args(parser=None):
@@ -71,6 +71,7 @@ def configure_params(params):
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
     params["Experiment"]["num_episodes"] = 50000
+    params["Experiment"]["num_scenarios"] = 1000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -108,6 +109,8 @@ def main():
     # configure belief observer
     splits = 8
     params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"))
+    params_behavior_filename = os.path.join(params["Experiment"]["dir"], "params_behavior_{}.json".format(experiment_id))
+    params.Save(filename=params_behavior_filename)
     behavior_space = configure_behavior_space(params_behavior)
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
@@ -123,7 +126,7 @@ def main():
 
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
-                             num_serialize_scenarios=100)
+                             num_serialize_scenarios=1000)
     dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense_1D")
     local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
     db = BenchmarkDatabase(database_root=local_release_filename)
@@ -134,7 +137,7 @@ def main():
                             evaluator=evaluator,
                             observer=observer,
                             viewer=viewer,
-                            render=False)
+                            render=is_local)
 
     run(params, env)
     return
