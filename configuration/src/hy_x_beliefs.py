@@ -95,7 +95,7 @@ def main():
     else:
         dir_prefix = "hy-x-beliefs.runfiles/hythe/"
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"))
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"), lock_if_default=True)
     params = configure_params(params)
     experiment_id = params["Experiment"]["random_seed"]
     params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
@@ -108,7 +108,8 @@ def main():
 
     # configure belief observer
     splits = 8
-    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"))
+    # if not passed, this wont show which values are missing
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"), lock_if_default=True)
     params_behavior_filename = os.path.join(params["Experiment"]["dir"], "params_behavior_{}.json".format(experiment_id))
     params.Save(filename=params_behavior_filename)
     behavior_space = configure_behavior_space(params_behavior)

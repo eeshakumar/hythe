@@ -35,8 +35,8 @@
             "N": 32,
             "Kappa": 1.0,
             "Ent_coefs": 0,
-            "FractionalLearningRate": 5e-06,
-            "QuantileLearningRate": 5e-06,
+            "FractionalLearningRate": 5e-03,
+            "QuantileLearningRate": 5e-03,
             "NumCosines": 64
         },
         "BaseAgent": {
@@ -49,10 +49,10 @@
             "Multi_step": 4,
             "Update_interval": 4,
             "TargetUpdateInterval": 100,
-            "StartSteps": 5000,
+            "StartSteps": 500,
             "EpsilonTrain": 0.1,
             "EpsilonEval": 0.01,
-            "EpsilonDecaySteps": 25000,
+            "EpsilonDecaySteps": 10000,
             "Double_q_learning": true,
             "DuelingNet": false,
             "NoisyNet": false,
