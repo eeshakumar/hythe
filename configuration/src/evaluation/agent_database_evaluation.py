@@ -62,13 +62,14 @@ benchmark_runner = BenchmarkRunner(benchmark_database = db,
                                     behaviors = behaviors, 
                                     num_scenarios=num_scenarios,
                                    log_eval_avg_every = 10,
-                                   checkpoint_dir = "checkpoints")
+                                   checkpoint_dir = "checkpoints",
+                                   deepcopy=False)
 
 viewer = MPViewer(
   params=ParameterServer(),
   center= [960, 1000.8],
   enforce_x_length=True,
-  x_length = 120.0,
+  x_length = 100.0,
   use_world_bounds=False)
 viewer.show()
 result = benchmark_runner.run(maintain_history=True, viewer=viewer)
