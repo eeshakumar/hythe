@@ -7,6 +7,8 @@ import os
 import sys
 import logging
 import matplotlib.pyplot as plt
+from argparse import ArgumentParser
+
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
@@ -16,13 +18,21 @@ import bark.core.commons
 from load.benchmark_database import BenchmarkDatabase
 from serialization.database_serializer import DatabaseSerializer
 from bark.benchmark.benchmark_runner_mp import BenchmarkRunnerMP, BenchmarkRunner
+from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
+from hythe.libs.observer.belief_observer import BeliefObserver
+from bark_ml.evaluators.goal_reached import GoalReached
+from hythe.libs.environments.gym import HyDiscreteHighway
+
 
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
 from bark.runtime.viewer.viewer import generatePoseFromState
 from bark.runtime.viewer.video_renderer import VideoRenderer
 
+import bark.core
+import bark.core.models.behavior
 from bark.core.models.dynamic import StateDefinition
-from bark.core.models.behavior import BehaviorMobil
+from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
+from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent import FQFAgent
 
 
 from bark.runtime.commons.parameters import ParameterServer
@@ -40,37 +50,72 @@ bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 max_steps = 50
 num_scenarios = 10
 
+def configure_args():
+    parser = ArgumentParser()
+    parser.add_argument('--checkpoint_dir', "--ckpd", type=str)
+    return parser.parse_args(sys.argv[1:])
+
 logging.getLogger().setLevel(logging.INFO)
 
+print("Experiment server at :", os.getcwd())
 
 dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=20, num_serialize_scenarios=num_scenarios)
-dbs.process("configuration/database", filter_sets="**/**/interaction_merging_light_dense.json")
+dbs.process("configuration/database", filter_sets="**/**/interaction_merging_light_dense_1D.json")
 local_release_filename = dbs.release(version="tmp2")
 
 db = BenchmarkDatabase(database_root=local_release_filename)
+scenario_generator, _, _ = db.get_scenario_generator(0)
 
 evaluators = {"success" : "EvaluatorGoalReached", "collision_other" : "EvaluatorCollisionEgoAgent",
        "out_of_drivable" : "EvaluatorDrivableArea", "max_steps": "EvaluatorStepCount"}
 terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: x, "max_steps": lambda x : x>max_steps, "success" : lambda x : x}
 
-params = ParameterServer()
-behaviors = {"behavior_ckpt1" : BehaviorMobil(params) }
+args = configure_args()
+exp_dir = args.checkpoint_dir
+import glob
+params_filename = glob.glob(os.path.join(exp_dir, "params_[!behavior]*"))[0]
+params = ParameterServer(filename=params_filename)
+params.load(fn=params_filename)
+params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
+params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
 
-benchmark_runner = BenchmarkRunner(benchmark_database = db,
-                                    evaluators = evaluators,
-                                    terminal_when = terminal_when,
-                                    behaviors = behaviors, 
-                                    num_scenarios=num_scenarios,
-                                   log_eval_avg_every = 10,
-                                   checkpoint_dir = "checkpoints",
-                                   deepcopy=False)
+# create env
+splits = 8
+params_behavior = ParameterServer(filename="configuration/params/1D_desired_gap_no_prior.json")
+behavior_space = BehaviorSpace(params_behavior)
 
+hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+observer = BeliefObserver(params, hypothesis_set, splits=splits)
+behavior = BehaviorDiscreteMacroActionsML(params_behavior)
+evaluator = GoalReached(params)
 viewer = MPViewer(
-  params=ParameterServer(),
+  params=params,
   center= [960, 1000.8],
   enforce_x_length=True,
   x_length = 100.0,
   use_world_bounds=False)
+env = HyDiscreteHighway(params=params,
+                        scenario_generation=scenario_generator,
+                        behavior=behavior,
+                        evaluator=evaluator,
+                        observer=observer,
+                        viewer=viewer,
+                        render=True)
+
+# load agent
+agent = FQFAgent(env=env, test_env=env, params=params)
+agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
+
+behaviors = {"behavior_fqf_agent": agent}
+benchmark_runner = BenchmarkRunner(benchmark_database = db,
+                                    evaluators = evaluators,
+                                    terminal_when = terminal_when,
+                                    behaviors = behaviors,
+                                    num_scenarios=num_scenarios,
+                                    log_eval_avg_every = 10,
+                                    checkpoint_dir = "checkpoints",
+                                    deepcopy=False)
+
 viewer.show()
 result = benchmark_runner.run(maintain_history=True, viewer=viewer)
 
