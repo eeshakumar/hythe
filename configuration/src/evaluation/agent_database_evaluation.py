@@ -22,12 +22,10 @@ from bark.runtime.viewer.viewer import generatePoseFromState
 from bark.runtime.viewer.video_renderer import VideoRenderer
 
 from bark.core.models.dynamic import StateDefinition
+from bark.core.models.behavior import BehaviorMobil
+
 
 from bark.runtime.commons.parameters import ParameterServer
-from src.evaluation.bark.behavior_configuration.behavior_configs import *
-from src.evaluation.bark.behavior_configuration.behavior_configurate import \
-        dump_defaults, create_behavior_configs, create_mcts_params, create_benchmark_configs
-
 from bark.runtime.scenario.scenario_generation.configurable_scenario_generation \
   import add_config_reader_module
 add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
@@ -44,38 +42,35 @@ num_scenarios = 10
 
 logging.getLogger().setLevel(logging.INFO)
 
-if not os.path.exists("src"):
-  logging.info("changing directory")
-  os.chdir("run_benchmark_interact.runfiles/phd")
-
 
 dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=20, num_serialize_scenarios=num_scenarios)
-dbs.process("src/evaluation/bark/database_configuration/database", filter_sets="**/**[nr]/*.json")
+dbs.process("configuration/database", filter_sets="**/**/interaction_merging_light_dense.json")
 local_release_filename = dbs.release(version="tmp2")
 
 db = BenchmarkDatabase(database_root=local_release_filename)
 
 evaluators = {"success" : "EvaluatorGoalReached", "collision_other" : "EvaluatorCollisionEgoAgent",
        "out_of_drivable" : "EvaluatorDrivableArea", "max_steps": "EvaluatorStepCount"}
-terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: x, "max_steps": lambda x : x>max_steps, "success" : lambda x: x}
+terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: x, "max_steps": lambda x : x>max_steps, "success" : lambda x : x}
 
 params = ParameterServer()
-behavior_configs = {"behavior_ckpt1" : BehaviorMobil(params) }
+behaviors = {"behavior_ckpt1" : BehaviorMobil(params) }
 
 benchmark_runner = BenchmarkRunner(benchmark_database = db,
                                     evaluators = evaluators,
                                     terminal_when = terminal_when,
-                                    behavior_configs = behavior_configs, 
+                                    behaviors = behaviors, 
                                     num_scenarios=num_scenarios,
-                                   log_eval_avg_every = 1,
+                                   log_eval_avg_every = 10,
                                    checkpoint_dir = "checkpoints")
 
 viewer = MPViewer(
   params=ParameterServer(),
-  center= [100, 1.8],
+  center= [960, 1000.8],
   enforce_x_length=True,
   x_length = 120.0,
   use_world_bounds=False)
+viewer.show()
 result = benchmark_runner.run(maintain_history=True, viewer=viewer)
 
 print(result.get_data_frame())
