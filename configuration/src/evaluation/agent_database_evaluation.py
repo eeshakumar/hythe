@@ -84,7 +84,7 @@ behavior_space = BehaviorSpace(params_behavior)
 
 hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
 observer = BeliefObserver(params, hypothesis_set, splits=splits)
-behavior = BehaviorDiscreteMacroActionsML(params_behavior)
+behavior = BehaviorDiscreteMacroActionsML(params)
 env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
                                                   observer=observer,
                                                   step_time=-1.0,
@@ -113,10 +113,10 @@ viewer = MPViewer(
   x_length = 100.0,
   use_world_bounds=False)
 viewer.show()
-result = benchmark_runner.run(maintain_history=True, viewer=viewer)
+result = benchmark_runner.run(viewer=viewer)
 
 print(result.get_data_frame())
-result.dump(os.path.join("./benchmark_results"), dump_histories=True, dump_configs=True)
+result.dump(os.path.join("./benchmark_results"))
 
-result_loaded = result.load(os.path.join("./benchmark_results"), load_histories=True, load_configs=True)
+result_loaded = result.load(os.path.join("./benchmark_results"))
 print(result.get_data_frame())

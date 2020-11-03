@@ -6,11 +6,11 @@ load("//utils:dependencies.bzl", "hythe_deps")
 hythe_deps()
 
 # -------- BARK Dependency -------------
-git_repository(
+local_repository(
     name = "bark_project",
-    commit="47586f8e19c27072aedb40bd4ce19d849bb9f45b",
-    remote = "https://github.com/juloberno/bark",
-   #path="/home/julo/development/bark"
+    #commit="47586f8e19c27072aedb40bd4ce19d849bb9f45b",
+    #remote = "https://github.com/juloberno/bark",
+    path="/home/julo/development/bark"
 )
 
 load("@bark_project//tools:deps.bzl", "bark_dependencies")
@@ -46,10 +46,11 @@ benchmark_database_release()
 # --------------------------------------------------
 
 # -------- Benchmark Database -----------------------
-git_repository(
+local_repository(
   name = "bark_ml_project",
-  commit = "b0a900705cafaed9636133d2448336fa4f06be41",
-  remote="https://github.com/bark-simulator/bark-ml"
+ # commit = "b0a900705cafaed9636133d2448336fa4f06be41",
+  #remote="https://github.com/bark-simulator/bark-ml",
+  path="/home/julo/development/bark-ml"
 )
 
 load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")

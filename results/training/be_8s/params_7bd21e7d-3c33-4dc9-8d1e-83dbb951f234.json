@@ -73,11 +73,10 @@
             "BehaviorMotionPrimitives": {
                 "IntegrationTimeDelta": 0.019999999552965164
             },
+            "AddGapKeeping" : true,
+            "AddLaneChangeActions" : true,
             "AccelerationInputs": [
-                0.0,
-                2.0,
-                -2.0,
-                -4.0
+                0, 1.0, 4.0, -1.0, -8.0
             ],
             "BehaviorIDMClassic": {
                 "MinimumSpacing": 1.0,
