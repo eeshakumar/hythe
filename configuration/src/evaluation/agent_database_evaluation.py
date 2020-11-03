@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 import glob
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 
 logging.basicConfig()
@@ -71,7 +71,8 @@ evaluators = {"success" : "EvaluatorGoalReached", "collision_other" : "Evaluator
        "out_of_drivable" : "EvaluatorDrivableArea", "max_steps": "EvaluatorStepCount"}
 terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: x, "max_steps": lambda x : x>max_steps, "success" : lambda x : x}
 
-exp_dir = "results/training/be_8s"
+args = configure_args()
+exp_dir = args.checkpoint_dir
 params_filename = glob.glob(os.path.join(exp_dir, "params_*"))[0]
 params = ParameterServer(filename=params_filename)
 params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
@@ -94,6 +95,7 @@ env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
 
 # load agent
 agent = FQFAgent(env=env_to_pass_observer_behavior, test_env=None, params=params)
+print("Agent load path", os.path.join(exp_dir, "agent/checkpoints/best"))
 agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
 
 behaviors = {"behavior_fqf_agent": agent}
