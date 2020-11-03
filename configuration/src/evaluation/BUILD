@@ -6,6 +6,7 @@ py_binary(
     data = [
         "//configuration/database",
         "//configuration/params:hy_params",
+        "//results/training:training"
     ],
     imports = [
         "../bark/",
@@ -26,5 +27,6 @@ py_binary(
         "@hythe//libs/environments:gym",
         "@hythe//libs/observer:belief_observer",
         "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "//configuration/src/common:common"
     ],
 )

@@ -6,6 +6,7 @@ except:
 import os
 import sys
 import logging
+import glob
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 
@@ -21,7 +22,7 @@ from bark.benchmark.benchmark_runner_mp import BenchmarkRunnerMP, BenchmarkRunne
 from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
 from hythe.libs.observer.belief_observer import BeliefObserver
 from bark_ml.evaluators.goal_reached import GoalReached
-from hythe.libs.environments.gym import HyDiscreteHighway
+from bark_ml.environments.single_agent_runtime import SingleAgentRuntime
 
 
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
@@ -70,12 +71,9 @@ evaluators = {"success" : "EvaluatorGoalReached", "collision_other" : "Evaluator
        "out_of_drivable" : "EvaluatorDrivableArea", "max_steps": "EvaluatorStepCount"}
 terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: x, "max_steps": lambda x : x>max_steps, "success" : lambda x : x}
 
-args = configure_args()
-exp_dir = args.checkpoint_dir
-import glob
-params_filename = glob.glob(os.path.join(exp_dir, "params_[!behavior]*"))[0]
+exp_dir = "results/training/be_8s"
+params_filename = glob.glob(os.path.join(exp_dir, "params_*"))[0]
 params = ParameterServer(filename=params_filename)
-params.load(fn=params_filename)
 params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
 params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
 
@@ -87,23 +85,15 @@ behavior_space = BehaviorSpace(params_behavior)
 hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
 observer = BeliefObserver(params, hypothesis_set, splits=splits)
 behavior = BehaviorDiscreteMacroActionsML(params_behavior)
-evaluator = GoalReached(params)
-viewer = MPViewer(
-  params=params,
-  center= [960, 1000.8],
-  enforce_x_length=True,
-  x_length = 100.0,
-  use_world_bounds=False)
-env = HyDiscreteHighway(params=params,
-                        scenario_generation=scenario_generator,
-                        behavior=behavior,
-                        evaluator=evaluator,
-                        observer=observer,
-                        viewer=viewer,
-                        render=True)
+env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
+                                                  observer=observer,
+                                                  step_time=-1.0,
+                                                  viewer=-1.0,
+                                                  scenario_generator=-1.0,
+                                                  evaluator=-1.0)
 
 # load agent
-agent = FQFAgent(env=env, test_env=env, params=params)
+agent = FQFAgent(env=env_to_pass_observer_behavior, test_env=None, params=params)
 agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
 
 behaviors = {"behavior_fqf_agent": agent}
@@ -116,6 +106,12 @@ benchmark_runner = BenchmarkRunner(benchmark_database = db,
                                     checkpoint_dir = "checkpoints",
                                     deepcopy=False)
 
+viewer = MPViewer(
+  params=params,
+  center= [960, 1000.8],
+  enforce_x_length=True,
+  x_length = 100.0,
+  use_world_bounds=False)
 viewer.show()
 result = benchmark_runner.run(maintain_history=True, viewer=viewer)
 
