@@ -144,9 +144,7 @@
                             ]
                         },
                         "ConfigControlledAgents": {
-                            "Type": "PositioningSingleAgent",
-                            "LanePosition" : 1,
-                            "WhereOnLane" : "math.floor(num_agents/2 - 0.5)"
+                            "Type": "NoneControlled"
                         },
                         "AgentParams": {
                             "MaxHistoryLength": 50
