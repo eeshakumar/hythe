@@ -22,25 +22,6 @@ cc_library(
     )
 
     _maybe(
-        #        native.local_repository,
-        native.local_repository,
-        name = "bark_ml_project",
-        #        commit = "5d81994712ccb6eb73da7420bf487110ed16ebeb",
-        #        remote = "https://github.com/bark-simulator/bark-ml",
-        path = "/home/ekumar/master_thesis/code/bark-ml",
-    )
-
-    _maybe(
-        #        git_repository,
-        native.local_repository,
-        name = "bark_project",
-        path = "/home/ekumar/master_thesis/code/bark-drl",
-        #        branch = "jb_bark_adaptations",
-        #        commit = "5e2ce8893e21f7236ee7c43351e61c0bce28a057",
-        #        remote = "https://github.com/eeshakumar/bark-drl",
-    )
-
-    _maybe(
         new_git_repository,
         name = "com_github_google_glog",
         commit = "195d416e3b1c8dc06980439f6acd3ebd40b6b820",
@@ -48,6 +29,7 @@ cc_library(
         build_file = "//:utils/glog.BUILD",
     )
 
+    # TODO: Do a check to remove this repo
     _maybe(
         #        new_git_repository,
         native.new_local_repository,
@@ -56,24 +38,4 @@ cc_library(
         #        remote = "https://github.com/eeshakumar/fqf-iqn-qrdqn.pytorch",
         path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
         build_file = "//:utils/BUILD.fqn",
-    )
-
-    _maybe(
-        #        git_repository,
-        native.local_repository,
-        name = "planner_uct",
-        #        branch = "risk_calculation_integration",
-        #                commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
-        #        remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
-        path = "/home/ekumar/master_thesis/code/bark_hypothesis_uct",
-    )
-
-    _maybe(
-        #        git_repository,
-        native.local_repository,
-        name = "diadem_project",
-        #        branch = "risk_calculation_integration",
-        #                commit = "e6434d0f12b8b7b23f29f57df600613a3f294fd2",
-        #        remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
-        path = "/home/ekumar/master_thesis/code/diadem",
     )
