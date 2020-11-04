@@ -19,3 +19,5 @@ ipython==7.13.0
 six==1.15.0
 importlib-metadata==1.6.0
 tensorflow==1.15.3
+seaborn==0.11.0
+torch==1.5.0
