@@ -183,7 +183,6 @@ py_binary(
     data = [
         "//configuration/database",
         "//configuration/params:hy_params",
-        #        "@bark_hypothesis_uct_project//bark_mcts/models/behavior/hypothesis/behavior_space",
         "@bark_project//bark:generate_core",
         "@bark_ml_project//bark_ml:generate_core",
         "@fqn//:fqn_config",
@@ -198,12 +197,8 @@ py_binary(
     ],
     main = "src/hy_x_beliefs.py",
     deps = [
-        #        "@bark_hypothesis_uct_project//bark_mcts/models/behavior/hypothesis/behavior_space",
-        #                "@bark_hypothesis_uct_project//bark_mcts/models/behavior/risk_calculation",
-        #        "@bark_hypothesis_uct_project//util/debug:debug_settings",
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
-        #        "@bark_project//bark/models/behavior",
         "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
         "@bark_project//bark/runtime/viewer:py_viewer",
         "@benchmark_database//load:benchmark_database",
@@ -215,6 +210,7 @@ py_binary(
         "@planner_uct//bark_mcts/runtime/scenario:config_readers",
         "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
         "@hythe//libs/observer:belief_observer",
+        "//configuration/src/common:common",
     ],
 )
 

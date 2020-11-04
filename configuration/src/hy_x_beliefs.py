@@ -1,8 +1,17 @@
+
+try:
+    import debug_settings
+except:
+    pass
 import logging
 import os
 from argparse import ArgumentParser
 from pathlib import Path
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
+logging.info("Running on process with ID: {}".format(os.getpid()))
+import bark.core.commons
 import bark.core
 import bark.core.models.behavior
 from bark.runtime.commons.parameters import ParameterServer
@@ -45,15 +54,6 @@ def configure_args(parser=None):
 
 def configure_agent(params, env):
     args = configure_args()
-
-    # with open(args.config) as f:
-    #     config = yaml.load(f, Loader=yaml.SafeLoader)
-
-    # name = args.config.split('/')[-1].rstrip('.yaml')
-    # time = datetime.now().strftime("%Y%m%d-%H%M")
-    # log_dir = os.path.join(
-    #     'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
-    # print('Loggind at', log_dir)
     agent = FQFAgent(env=env, test_env=env, params=params)
     return agent, args
 
@@ -101,16 +101,11 @@ def main():
     params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
     params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
-    params.Save(filename=params_filename)
-    logging.info('-' * 60)
-    logging.info("Writing params to :{}".format(params_filename))
-    logging.info('-' * 60)
 
     # configure belief observer
     splits = 8
     params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"))
-    params_behavior_filename = os.path.join(params["Experiment"]["dir"], "params_behavior_{}.json".format(experiment_id))
-    params.Save(filename=params_behavior_filename)
+    params_behavior_filename = os.path.join(params["Experiment"]["dir"], "behavior_params_{}.json".format(experiment_id))
     behavior_space = configure_behavior_space(params_behavior)
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
@@ -127,10 +122,10 @@ def main():
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                              num_serialize_scenarios=1000)
-    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense_1D")
-    local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
+    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
+    local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
-    scenario_generator, _, _ = db.get_scenario_generator(0)
+    scenario_generator, _, _ = db.get_scenario_generator(scenario_set_id=0)
     env = HyDiscreteHighway(params=params,
                             scenario_generation=scenario_generator,
                             behavior=behavior,
@@ -140,6 +135,15 @@ def main():
                             render=is_local)
 
     run(params, env)
+    params.Save(filename=params_filename)
+    logging.info('-' * 60)
+    logging.info("Writing params to :{}".format(params_filename))
+    logging.info('-' * 60)
+    params_behavior.Save(filename=params_behavior_filename)
+    logging.info('-' * 60)
+    logging.info("Writing behavior params to :{}".format(params_behavior_filename))
+    logging.info('-' * 60)
+
     return
 
 
