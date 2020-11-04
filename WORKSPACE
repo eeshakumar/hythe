@@ -49,7 +49,7 @@ benchmark_database_dependencies()
 benchmark_database_release()
 # --------------------------------------------------
 
-# -------- Benchmark Database -----------------------
+# -------- Bark ML -----------------------
 git_repository(
     name = "bark_ml_project",
     commit = "67151b53c5741ce038ab21e2a9636c1282f4acb3",

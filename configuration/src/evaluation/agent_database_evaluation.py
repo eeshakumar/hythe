@@ -73,19 +73,21 @@ terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: 
 
 args = configure_args()
 exp_dir = args.checkpoint_dir
-params_filename = glob.glob(os.path.join(exp_dir, "params_*"))[0]
+params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
 params = ParameterServer(filename=params_filename)
 params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
 params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
 
 # create env
 splits = 8
-params_behavior = ParameterServer(filename="configuration/params/1D_desired_gap_no_prior.json")
+behavior_params_filename = glob.glob(os.path.join(exp_dir, "behavior_params*"))[0]
+params_behavior = ParameterServer(filename=behavior_params_filename)
 behavior_space = BehaviorSpace(params_behavior)
 
 hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
 observer = BeliefObserver(params, hypothesis_set, splits=splits)
-behavior = BehaviorDiscreteMacroActionsML(params)
+behavior = BehaviorDiscreteMacroActionsML(params_behavior)
+
 env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
                                                   observer=observer,
                                                   step_time=-1.0,
@@ -95,7 +97,6 @@ env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
 
 # load agent
 agent = FQFAgent(env=env_to_pass_observer_behavior, test_env=None, params=params)
-print("Agent load path", os.path.join(exp_dir, "agent/checkpoints/best"))
 agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
 
 behaviors = {"behavior_fqf_agent": agent}

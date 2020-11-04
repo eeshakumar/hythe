@@ -8,6 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
+            "args": ["--checkpoint_dir", "/home/ekumar/output/experiments/exp_03a83fb8-4696-48b2-9ba0-7dfcbd839334"],
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
