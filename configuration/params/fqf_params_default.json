@@ -23,6 +23,10 @@
             "NormalizationEnabled": true,
             "MaxNumAgents": 4
         },
+        "BeliefObserver": {
+            "EnableThreshold": true,
+            "Threshold": 0.05
+        },
         "NearestAgentsObserver": {
             "MaxOtherDistance": 100
         },
