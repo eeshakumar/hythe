@@ -73,15 +73,18 @@ terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: 
 
 args = configure_args()
 exp_dir = args.checkpoint_dir
+if exp_dir is None:
+  exp_dir = "results/training/toy_benchmark"
+
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
-params = ParameterServer(filename=params_filename)
+params = ParameterServer(filename=params_filename, log_if_default=True)
 params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
 params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
 
 # create env
 splits = 8
 behavior_params_filename = glob.glob(os.path.join(exp_dir, "behavior_params*"))[0]
-params_behavior = ParameterServer(filename=behavior_params_filename)
+params_behavior = ParameterServer(filename=behavior_params_filename, log_if_default=True)
 behavior_space = BehaviorSpace(params_behavior)
 
 hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
