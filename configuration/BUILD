@@ -215,6 +215,44 @@ py_binary(
 )
 
 py_binary(
+    name = "hy-x-iqn-beliefs",
+    srcs = [
+        "src/hy_x_iqn_beliefs.py",
+    ],
+    data = [
+        "//configuration/database",
+        "//configuration/params:hy_params",
+        "@bark_project//bark:generate_core",
+        "@bark_ml_project//bark_ml:generate_core",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_mcts/",
+        "../bark_mcts/python_wrapper/",
+        "../bark_ml/",
+        "../bark_ml/python_wrapper",
+        "../python/",
+    ],
+    main = "src/hy_x_iqn_beliefs.py",
+    deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
+        "@bark_project//bark/runtime/viewer:py_viewer",
+        "@benchmark_database//load:benchmark_database",
+        "@benchmark_database//serialization:database_serializer",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
+        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
+        "@hythe//libs/observer:belief_observer",
+        "//configuration/src/common:common",
+    ],
+)
+
+py_binary(
     name = "hy-exp-load",
     srcs = [
         "src/experiment_loader.py",
@@ -401,45 +439,5 @@ py_test(
         "@hythe//libs/timer",
         "@planner_uct//bark_mcts/runtime/scenario:config_readers",
         "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
-    ],
-)
-
-py_binary(
-    name = "hy-plot-beliefs",
-    srcs = [
-        "src/plot_beliefs.py",
-    ],
-    data = [
-        "//configuration/database",
-        "//configuration/params:hy_params",
-        "@bark_ml_project//bark_ml:generate_core",
-        "@bark_project//bark:generate_core",
-        "@fqn//:fqn_config",
-    ],
-    imports = [
-        "../bark/",
-        "../bark_mcts/",
-        "../bark_mcts/python_wrapper/",
-        "../bark_ml/",
-        "../bark_ml/python_wrapper",
-        "../python/",
-    ],
-    main = "src/plot_beliefs.py",
-    deps = [
-        "@bark_ml_project//bark_ml/environments:blueprints",
-        "@bark_ml_project//bark_ml/environments:gym",
-        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
-        "@bark_project//bark/runtime/viewer:py_viewer",
-        "@benchmark_database//load:benchmark_database",
-        "@benchmark_database//serialization:database_serializer",
-        "@fqn//:pylib_fqn",
-        "@hythe//libs/blueprint",
-        "@hythe//libs/environments:gym",
-        "@hythe//libs/experiments:experiment",
-        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
-        "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
-        "@hythe//libs/observer:belief_observer",
-        "@bark_project//bark/runtime/viewer:video_renderer",
-
     ],
 )
