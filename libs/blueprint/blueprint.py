@@ -23,7 +23,7 @@ class HyHighwayBlueprint(Blueprint):
                  evaluator=None,
                  observer=None,
                  scenario_generation=None,
-                 viewer=False):
+                 viewer=None):
         if scenario_generation is None:
             left_lane = HighwayLaneCorridorConfig(params=params,
                                                   road_ids=[16],
@@ -45,7 +45,7 @@ class HyHighwayBlueprint(Blueprint):
                 lane_corridor_configs=[left_lane, right_lane]
             )
 
-        if viewer:
+        if viewer is None:
             viewer = MPViewer(params=params,
                               x_range=[-35, 35],
                               y_range=[-35, 35],
@@ -73,7 +73,7 @@ class HyHighwayDiscreteBlueprint(HyHighwayBlueprint):
                  evaluator=None,
                  observer=None,
                  scenario_generation=None,
-                 viewer=True):
+                 viewer=None):
         if behavior is None:
             behavior = BehaviorDiscreteMacroActionsML(params)
 
