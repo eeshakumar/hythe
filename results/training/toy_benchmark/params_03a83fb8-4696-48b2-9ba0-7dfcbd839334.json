@@ -63,7 +63,7 @@
             "NumEvalSteps": 500,
             "MaxEpisodeSteps": 100000,
             "GradCliping": 5.0,
-            "Cuda": true,
+            "Cuda": false,
             "Seed": 0
         },
         "BehaviorMPMacroActions": {
@@ -75,9 +75,10 @@
             },
             "AccelerationInputs": [
                 0.0,
-                2.0,
+                1.0,
+                -1.0,
                 -2.0,
-                -4.0
+                5.0
             ],
             "BehaviorIDMClassic": {
                 "MinimumSpacing": 1.0,
@@ -104,7 +105,7 @@
             },
             "MinLength": 0.0,
             "AddLaneChangeActions": true,
-            "AddGapKeeping": false
+            "AddGapKeeping": true
         },
         "FQFModel": {
             "Target": false,

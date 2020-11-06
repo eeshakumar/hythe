@@ -118,8 +118,8 @@ viewer = MPViewer(
   enforce_x_length=True,
   x_length = 100.0,
   use_world_bounds=False)
-viewer.show()
-result = benchmark_runner.run(viewer=viewer)
+#viewer.show()
+result = benchmark_runner.run(viewer=None)
 
 print(result.get_data_frame())
 result.dump(os.path.join("./benchmark_results"))

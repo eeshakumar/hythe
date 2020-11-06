@@ -36,12 +36,12 @@
             "name": "(gdb) Attach",
             "type": "cppdbg",
             "request": "attach",
-            "program": "${workspaceFolder}/tools/python/venv/bin/python3",
+            "program": "${workspaceFolder}/python/venv/bin/python3",
             "cwd" : "${workspaceFolder}",
-            "additionalSOLibSearchPath":"${workspaceFolder}/bazel-bin/src/evaluation/bark/database_configuration/scenario_tuning.runfiles/bark_project/bark",
+            "additionalSOLibSearchPath":"${workspaceFolder}/bazel-bin/configuration/src/evaluation/bark/agent_database_evaluation.runfiles/bark_project/bark",
             "processId": "${command:pickProcess}",
             "MIMode": "gdb",
-            "sourceFileMap" : {"/proc/self/cwd/external" : "${workspaceFolder}/bazel-thesis/external" }
+            "sourceFileMap" : {"/proc/self/cwd/external" : "${workspaceFolder}/bazel-hythe-src/external" }
             }
     ]
 }
