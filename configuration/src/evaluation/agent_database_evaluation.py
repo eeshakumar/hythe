@@ -73,9 +73,10 @@ terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: 
 
 args = configure_args()
 exp_dir = args.checkpoint_dir
-print("Loading results from: ", exp_dir)
+
 if exp_dir is None:
-  exp_dir = "results/training/toy_benchmark"
+  exp_dir = "/home/ekumar/output/experiments/exp_3fdc1a48-d043-4f93-9054-87860aea61d8/"
+print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
 params = ParameterServer(filename=params_filename, log_if_default=True)

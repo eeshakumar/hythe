@@ -123,7 +123,7 @@ def main():
 
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
-                             num_serialize_scenarios=10)
+                             num_serialize_scenarios=2)
     dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
     local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
