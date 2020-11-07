@@ -1,3 +1,8 @@
+try:
+    import debug_settings
+except:
+    pass
+
 from argparse import ArgumentParser
 import os
 from pathlib import Path
@@ -5,10 +10,15 @@ from datetime import datetime
 import yaml
 import time
 
+import bark.core.commons
+import bark.core
+import bark.core.models.behavior
+
 from bark.runtime.scenario.scenario_generation import ConfigurableScenarioGeneration
 from hythe.libs.experiments.experiment import Experiment
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
 from hythe.libs.environments.gym import HyDiscreteHighway, GymSingleAgentRuntime
+from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
 
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent import FQFAgent
 from bark_project.bark.runtime.commons.parameters import ParameterServer
@@ -17,10 +27,8 @@ from bark_ml.evaluators.goal_reached_guiding import GoalReachedGuiding
 from bark_ml.evaluators.goal_reached import GoalReached
 
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
+from hythe.libs.observer.belief_observer import BeliefObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
-
-from load.benchmark_database import BenchmarkDatabase
-from serialization.database_serializer import DatabaseSerializer
 
 
 def configure_args(parser=None):
@@ -36,22 +44,13 @@ def configure_args(parser=None):
 
 def configure_agent(env, params):
     args = configure_args()
-
-    # with open(args.config) as f:
-    #     config = yaml.load(f, Loader=yaml.SafeLoader)
-    #
-    # name = args.config.split('/')[-1].rstrip('.yaml')
-    # time = datetime.now().strftime("%Y%m%d-%H%M")
-    # log_dir = os.path.join(
-    #     'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
-    # print('Loggind at', log_dir)
     agent = FQFAgent(env=env, test_env=env, params=params)
     return agent
 
 
 def main():
-    output_dir = "/home/ekumar/output/experiments"
-    exp_id = "exp_f9d3badb-628f-41d2-9a9f-d2d25faf0805"
+    output_dir = "/home/ekumar/output/experiments/"
+    exp_id = "exp_43f43d2a-d4c5-4754-afa1-80d0c1715a32/"
     exp_dir = os.path.join(output_dir, exp_id)
     import glob
     params_filename = glob.glob(os.path.join(exp_dir, "params_*"))
@@ -60,9 +59,20 @@ def main():
     # params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(exp_dir, "agent/summaries")
     # params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/checkpoints")
     # params.load(fn=params_filename)
-    behavior = BehaviorDiscreteMacroActionsML(params)
+    behavior_params_filename = glob.glob(os.path.join(exp_dir, "behavior_params*"))
+    print(behavior_params_filename)
+    if behavior_params_filename:
+      splits = 8
+      behavior_params = ParameterServer(filename=behavior_params_filename[0])
+      behavior_space = BehaviorSpace(behavior_params)
+      hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+      observer = BeliefObserver(params, hypothesis_set, splits=splits)
+      behavior = BehaviorDiscreteMacroActionsML(behavior_params)
+    else:
+      behavior = BehaviorDiscreteMacroActionsML(params)
+      observer = NearestAgentsObserver(params)
+
     evaluator = GoalReached(params)
-    observer = NearestAgentsObserver(params)
     scenario_generator = ConfigurableScenarioGeneration(params=params, num_scenarios=5)
     scenario_file = glob.glob(os.path.join(exp_dir, "scenarios_list*"))
     print(scenario_file)
@@ -79,10 +89,9 @@ def main():
                             render=True)
 
     agent = configure_agent(env, params)
-    # # print(agent.online_net.state_dict())
-    # # print(agent.online_net.dqn_net.state_dict())
-    agent.load_models(exp_dir)
-    # agent.load_models(os.path.join(exp_dir, "agent/checkpoints/final"))
+
+    # agent.load_models(exp_dir)
+    agent.load_models(os.path.join(exp_dir, "agent/checkpoints/final"))
     agent.evaluate()
 
 

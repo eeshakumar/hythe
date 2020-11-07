@@ -70,7 +70,7 @@ def configure_params(params):
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 5
+    params["Experiment"]["num_episodes"] = 1000
     params["Experiment"]["num_scenarios"] = 10
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
@@ -95,7 +95,8 @@ def main():
     else:
         dir_prefix = "hy-x-beliefs.runfiles/hythe/"
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"))
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"),
+                             log_if_default=True)
     params = configure_params(params)
     experiment_id = params["Experiment"]["random_seed"]
     params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
@@ -104,7 +105,8 @@ def main():
 
     # configure belief observer
     splits = 8
-    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"))
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"),
+                                      log_if_default=True)
     params_behavior_filename = os.path.join(params["Experiment"]["dir"], "behavior_params_{}.json".format(experiment_id))
     behavior_space = configure_behavior_space(params_behavior)
 
@@ -132,7 +134,7 @@ def main():
                             evaluator=evaluator,
                             observer=observer,
                             viewer=viewer,
-                            render=is_local)
+                            render=False)
 
     run(params, env)
     params.Save(filename=params_filename)

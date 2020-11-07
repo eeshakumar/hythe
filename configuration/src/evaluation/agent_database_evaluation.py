@@ -48,8 +48,8 @@ logging.info("Logging into: {}".format(log_folder))
 bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 
 # reduced max steps and scenarios for testing
-max_steps = 50
-num_scenarios = 10
+max_steps = 100
+num_scenarios = 2
 
 def configure_args():
     parser = ArgumentParser()
@@ -73,6 +73,7 @@ terminal_when = {"collision_other" : lambda x: x, "out_of_drivable" : lambda x: 
 
 args = configure_args()
 exp_dir = args.checkpoint_dir
+print("Loading results from: ", exp_dir)
 if exp_dir is None:
   exp_dir = "results/training/toy_benchmark"
 
@@ -118,11 +119,11 @@ viewer = MPViewer(
   enforce_x_length=True,
   x_length = 100.0,
   use_world_bounds=False)
-#viewer.show()
-result = benchmark_runner.run(viewer=None)
+viewer.show()
+result = benchmark_runner.run(viewer=viewer)
 
 print(result.get_data_frame())
-result.dump(os.path.join("./benchmark_results"))
+result.dump(os.path.join(exp_dir, "benchmark_results"))
 
-result_loaded = result.load(os.path.join("./benchmark_results"))
+result_loaded = result.load(os.path.join(exp_dir, "benchmark_results"))
 print(result.get_data_frame())
