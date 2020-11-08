@@ -34,33 +34,19 @@ is_local = False
 def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
-    parser.add_argument(
-        '--config', type=str, default=os.path.join('external/fqn/config', 'fqf.yaml'))
-    parser.add_argument('--env_id', type=str, default='hy-highway-v0')
-    parser.add_argument('--cuda', action='store_true', default=True)
-    parser.add_argument('--seed', type=int, default=122)
     parser.add_argument('--mode', type=str, default="train")
+    parser.add_argument("--jobname", type=str)
     return parser.parse_args()
 
 
 def configure_agent(params, env):
-    args = configure_args()
-
-    # with open(args.config) as f:
-    #     config = yaml.load(f, Loader=yaml.SafeLoader)
-
-    # name = args.config.split('/')[-1].rstrip('.yaml')
-    # time = datetime.now().strftime("%Y%m%d-%H%M")
-    # log_dir = os.path.join(
-    #     'logs', args.env_id, f'{name}-seed{args.seed}-{time}')
-    # print('Loggind at', log_dir)
     agent = FQFAgent(env=env, test_env=env, params=params)
-    return agent, args
+    return agent
 
 
-def configure_params(params):
+def configure_params(params, seed=None):
     import uuid
-    experiment_seed = str(uuid.uuid4())
+    experiment_seed = seed or str(uuid.uuid4())
     params["Experiment"]["random_seed"] = experiment_seed
     params["Experiment"]["dir"] = str(Path.home().joinpath("output/experiments/exp_{}".format(experiment_seed)))
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
@@ -72,21 +58,46 @@ def configure_params(params):
     return params
 
 
-def run(params, env):
-    agent, args = configure_agent(params, env)
-    if args.mode == "train":
-        exp = Experiment(params=params, agent=agent)
-        exp.run()
+def run(params, env, exp_exists=False):
+    agent = configure_agent(params, env)
+    if exp_exists:
+      agent_checkpoint_last = os.path.join(params["Experiment"]["dir"], "agent/checkpoints/best")
+      if os.path.isdir(agent_checkpoint_last):
+        print("Loading from last best checkpoint.")
+        agent.load_models(agent_checkpoint_last)
+      else:
+        print("No checkpoint written.") 
+    exp = Experiment(params=params, agent=agent)
+    exp.run()
+
+
+def check_if_exp_exists(params):
+  return os.path.isdir(params["Experiment"]["dir"])
 
 
 def main():
+    args = configure_args()
     if is_local:
         dir_prefix = ""
     else:
         dir_prefix="hy-fqf-exp.runfiles/hythe/"
+    print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_higher_exploration.json"))
-    params = configure_params(params)
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/fqf_params_default.json"),
+                             log_if_default=True)
+    params = configure_params(params, seed=args.jobname)
+    experiment_id = params["Experiment"]["random_seed"]
+    params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
+
+    # check if exp exists and handle preemption
+    exp_exists = check_if_exp_exists(params)
+    if exp_exists:
+      print("Loading existing experiment from: {}".format(args.jobname, (params["Experiment"]["dir"])))
+      if os.path.isfile(params_filename):
+        params = ParameterServer(filename=params_filename, log_if_default=True)
+    else:
+      Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)  
+
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
     observer = NearestAgentsObserver(params)
@@ -95,21 +106,20 @@ def main():
                       y_range=[-35, 35],
                       follow_agent_id=True)
 
-    # estract params and save experiment parameters
-    experiment_id = params["Experiment"]["random_seed"]
+    # extract params and save experiment parameters
     params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
     params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
-    params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
 
     params.Save(filename=params_filename)
     logging.info('-' * 60)
     logging.info("Writing params to :{}".format(params_filename))
     logging.info('-' * 60)
+
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                              num_serialize_scenarios=1000)
-    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="interaction_merging_light_dense")
-    local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
+    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
+    local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
     scenario_generator, _, _ = db.get_scenario_generator(0)
 
@@ -122,6 +132,10 @@ def main():
                             render=is_local)
 
     run(params, env)
+    params.Save(params_filename)
+    logging.info('-' * 60)
+    logging.info("Writing params to :{}".format(params_filename))
+    logging.info('-' * 60)
 
 
 if __name__ == '__main__':

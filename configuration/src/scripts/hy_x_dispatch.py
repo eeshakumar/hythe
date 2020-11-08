@@ -37,7 +37,7 @@ def main():
         #
         # bazel_bin_root = os.path.join(parsed_args.bazelwsroot, "bazel-bin/configuration")
         # dispatcher.deploy(bazel_bin_root, parsed_args.remotepath)
-        cmd = "sbatch --job-name={jobname} run.sh {target}".format(
+        cmd = "sbatch --job-name={jobname} run.sh {target} --jobname={jobname}".format(
             target=parsed_args.target, jobname=parsed_args.jobname)
         print()
         dispatcher.execute(cmd, exec_path=os.path.join(
