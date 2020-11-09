@@ -75,7 +75,7 @@ args = configure_args()
 exp_dir = args.checkpoint_dir
 
 if exp_dir is None:
-  exp_dir = "/home/ekumar/output/experiments/exp_3fdc1a48-d043-4f93-9054-87860aea61d8/"
+  exp_dir = "results/training/toy_evaluation"
 print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
