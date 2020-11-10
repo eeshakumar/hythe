@@ -52,7 +52,7 @@ def configure_args(parser=None):
     if parser is None:
         parser = ArgumentParser()
     parser.add_argument('--mode', type=str, default="train")
-    parser.add_argument('--output_dir', "--od", type=str)
+    parser.add_argument('--output_dir', "--od", type=str, default="results/debug/exp_7bd21e7d-3c33-4dc9-8d1e-83dbb951f234")
     parser.add_argument('--episode_no', "--en", type=int, default=1000)
     return parser.parse_args(sys.argv[1:])
 
@@ -116,19 +116,35 @@ def main():
     step = 1
     env.reset()
 
+    threshold = observer.is_enabled_threshold
+    discretize = observer.is_discretize
     
     beliefs_df = pd.DataFrame(columns=["Step", "Action", "Agent", "Beliefs", "HyNum"])
     while step <= num_steps:
         action = 5 #np.random.randint(0, behavior.action_space.n)
         next_state, reward, done, info = env.step(action)
         for agent, beliefs in observer.beliefs.items():
+            beliefs = np.asarray(beliefs)
+            if discretize:
+              beliefs = observer.discretize_beliefs(beliefs)
+            if threshold:
+              beliefs = observer.threshold_beliefs(beliefs)
             for i, belief in enumerate(beliefs):
                 beliefs_df = beliefs_df.append({"Step": step, "Action": action, "Agent": agent, "Beliefs": belief, "HyNum": i}, ignore_index=True)
         step += 1
 
+    suffix = "switch"
+    if threshold:
+      suffix += "_threshold"
+    if discretize:
+      suffix += "_discretize"
     beliefs_data_filename = "beliefs_{}_{}_{}".format(splits, num_samples, num_steps)
+    beliefs_data_filename += suffix
+    print(beliefs_data_filename)
     beliefs_df.to_pickle(os.path.join(str(Path.home()), "master_thesis/code/hythe-src/beliefs_data/", beliefs_data_filename))
     video_filename = os.path.join(str(Path.home()), "master_thesis/code/hythe-src/beliefs_data/", "video_{}".format(num_samples))
+    print(video_filename)
+    video_filename += suffix
     print(video_filename)
     video_renderer.export_video(filename=video_filename)
     return
