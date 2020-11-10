@@ -50,10 +50,12 @@ benchmark_database_release()
 # --------------------------------------------------
 
 # -------- Bark ML -----------------------
-git_repository(
+local_repository(
     name = "bark_ml_project",
-    commit = "67151b53c5741ce038ab21e2a9636c1282f4acb3",
-    remote = "https://github.com/eeshakumar/bark-ml",
+  #  commit = "616648e0b94bfb3e8581357f59ff321cb0c43e88",
+  #  remote = "https://github.com/eeshakumar/bark-ml",
+  path = "/home/julo/development/bark-ml"
+ # remote = "https://github.com/bark-simulator/bark-ml",
 )
 
 load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
