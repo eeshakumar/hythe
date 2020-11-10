@@ -49,7 +49,7 @@ bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 
 # reduced max steps and scenarios for testing
 max_steps = 100
-num_scenarios = 2
+num_scenarios = 10
 
 def configure_args():
     parser = ArgumentParser()
@@ -75,7 +75,7 @@ args = configure_args()
 exp_dir = args.checkpoint_dir
 
 if exp_dir is None:
-  exp_dir = "results/training/toy_evaluation"
+  exp_dir = "results/training/toy_benchmark"
 print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]

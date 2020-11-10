@@ -80,10 +80,15 @@ def main():
                             scenario_generation=scenario_generator,
                             render=True)
 
+    env.reset()
+    actions = [0, 1, 2, 3, 4, 5, 6]
+    for action in actions:
+      print(action)
+      env.step(action)
     agent = FQFAgent(env=env, test_env=env, params=params)
 
     agent.load_models(os.path.join(exp_dir, "agent/checkpoints/final"))
-    agent.evaluate()
+    # agent.evaluate()
 
 
 if __name__ == '__main__':
