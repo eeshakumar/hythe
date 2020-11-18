@@ -43,7 +43,7 @@
             "RandomSeed": 1000,
             "HypothesisModel": "BehaviorHypothesisIDM",
             "BehaviorHypothesisIDM": {
-                "NumSamples": 5000,
+                "NumSamples": 1000,
                 "NumBuckets": 100,
                 "BucketsUpperBound": 5.1,
                 "BucketsLowerBound": -5.1
