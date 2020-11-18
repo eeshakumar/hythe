@@ -51,16 +51,10 @@ class Experiment(object):
         try:
             if episode_num % self._dump_scenarios_interval == 0:
                 logging.info('-' * 60)
-                scenarios_filename, params_filename = self.update_filenames(episode_num=episode_num)
+                scenarios_filename, _ = self.update_filenames(episode_num=episode_num)
                 logging.info("Writing scenarios to :{}".format(scenarios_filename))
                 logging.info('-' * 60)
-                # logging.info("Writing params to :{}".format(scenarios_filename))
-                # logging.info('-' * 60)
-
                 self._blueprint.scenario_generation.dump_scenario_list(scenarios_filename)
-
-                # self._blueprint.scenario_generation.params.Save(params_filename)
-                # self._agent.save_models(self.dir)
         except TypeError or IOError as error:
             print("Could not save experiment:", error)
 
