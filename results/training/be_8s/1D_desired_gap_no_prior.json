@@ -25,21 +25,11 @@
                         0.0,
                         4.0
                     ],
-                    "SpacingDistribution": [
-                        0.25
-                    ],
-                    "MaxAccDistribution": [
-                        1.5
-                    ],
-                    "DesiredVelDistribution": [
-                        8.0
-                    ],
-                    "ComftBrakingDistribution": [
-                        2.5
-                    ],
-                    "CoolnessFactorDistribution": [
-                        0.99
-                    ]
+                    "SpacingDistribution": [ 0.25 ],
+                    "MaxAccDistribution": [ 1.5 ],
+                    "DesiredVelDistribution": [ 8.0 ],
+                    "ComftBrakingDistribution": [ 2.5 ],
+                    "CoolnessFactorDistribution": [0.99]
                 }
             },
             "PriorKnowledgeFunction": {
@@ -53,7 +43,7 @@
             "RandomSeed": 1000,
             "HypothesisModel": "BehaviorHypothesisIDM",
             "BehaviorHypothesisIDM": {
-                "NumSamples": 1000,
+                "NumSamples": 5000,
                 "NumBuckets": 100,
                 "BucketsUpperBound": 5.1,
                 "BucketsLowerBound": -5.1
