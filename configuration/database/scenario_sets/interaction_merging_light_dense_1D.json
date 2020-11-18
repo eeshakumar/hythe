@@ -305,7 +305,7 @@
     },
     "World": {
         "remove_agents_out_of_map": true,
-        "FracLateralOffset" : 0.8
+        "FracLateralOffset" : 100
     },
     "Simulation" : {
         "StepTime" : 0.2
