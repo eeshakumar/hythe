@@ -37,9 +37,9 @@
         },
         "BeliefObserver": {
             "EnableThreshold": true,
-            "Threshold": 0.05,
-            "Discretize": false,
-            "NumBuckets": 8
+            "Threshold": 0.05,  
+            "Discretize": true,
+            "NumBuckets": 16
         },
         "NearestAgentsObserver":{
             "MaxOtherDistance":100
@@ -65,7 +65,7 @@
             "Gamma":0.99,
             "Multi_step":1,
             "Update_interval":4,
-            "TargetUpdateInterval":10000,
+            "TargetUpdateInterval":100,
             "StartSteps":5000,
             "EpsilonTrain":0.01,
             "EpsilonEval":0.001,
@@ -81,6 +81,47 @@
             "GradCliping":5.0,
             "Cuda":true,
             "Seed":0
+        },
+        "BehaviorMPMacroActions": {
+            "BehaviorMPMacroActions": {
+                "CheckValidityInPlan": false
+            },
+            "BehaviorMotionPrimitives": {
+                "IntegrationTimeDelta": 0.019999999552965164
+            },
+            "AccelerationInputs": [
+                0.0,
+                1.0,
+                -1.0,
+                -2.0,
+                -5.0
+            ],
+            "BehaviorIDMClassic": {
+                "MinimumSpacing": 1.0,
+                "DesiredTimeHeadway": 0.0,
+                "MaxAcceleration": 1.7000000476837158,
+                "AccelerationLowerBound": -5.0,
+                "AccelerationUpperBound": 5.0,
+                "DesiredVelocity": 15.0,
+                "ComfortableBrakingAcceleration": 1.6699999570846558,
+                "MinVelocity": 0.0,
+                "MaxVelocity": 50.0,
+                "Exponent": 4,
+                "BrakeForLaneEnd": true,
+                "BrakeForLaneEndEnabledDistance": 60.0,
+                "BrakeForLaneEndDistanceOffset": 20.0,
+                "NumTrajectoryTimePoints": 11,
+                "CoolnessFactor": 0.0
+            },
+            "BehaviorIDMLaneTracking": {
+                "CrosstrackErrorGain": 2.0
+            },
+            "PrimitiveConstAccStayLane": {
+                "Acceleration": 0.0
+            },
+            "MinLength": 0.0,
+            "AddLaneChangeActions": true,
+            "AddGapKeeping": true
         }
     },
     "BehaviorIDMClassic":{
