@@ -1,17 +1,4 @@
 py_binary(
-    name = "cib",
-    srcs = [
-        "src/main.py",
-    ],
-    imports = ["../python/"],
-    main = "src/main.py",
-    deps = [
-        "@bark_ml_project//bark_ml/behaviors",
-        "@bark_project//modules/runtime",
-    ],
-)
-
-py_binary(
     name = "train-fqf",
     srcs = [
         "src/fqf.py",
@@ -110,7 +97,7 @@ py_binary(
 py_binary(
     name = "hy-fqf-exp",
     srcs = [
-        "src/hy_fqf_benchmark_runner.py",
+        "hy_fqf_runner.py",
     ],
     data = [
         "//configuration/database",
@@ -125,7 +112,42 @@ py_binary(
         "../bark_ml/python_wrapper",
         "../python/",
     ],
-    main = "src/hy_fqf_benchmark_runner.py",
+    main = "hy_fqf_runner.py",
+    deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
+        "@bark_project//bark/runtime/viewer:py_viewer",
+        "@benchmark_database//load:benchmark_database",
+        "@benchmark_database//serialization:database_serializer",
+        "@fqn//:pylib_fqn",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
+        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
+    ],
+)
+
+py_binary(
+    name = "hy-iqn-exp",
+    srcs = [
+        "hy_iqn_runner.py",
+    ],
+    data = [
+        "//configuration/database",
+        "//configuration/params:hy_params",
+        "@bark_ml_project//bark_ml:generate_core",
+        "@bark_project//bark:generate_core",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../bark_ml/python_wrapper",
+        "../python/",
+    ],
+    main = "hy_iqn_runner.py",
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
@@ -178,7 +200,7 @@ py_binary(
 py_binary(
     name = "hy-x-beliefs",
     srcs = [
-        "src/hy_x_beliefs.py",
+        "hy_x_beliefs.py",
     ],
     data = [
         "//configuration/database",
@@ -195,7 +217,7 @@ py_binary(
         "../bark_ml/python_wrapper",
         "../python/",
     ],
-    main = "src/hy_x_beliefs.py",
+    main = "hy_x_beliefs.py",
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
@@ -217,7 +239,7 @@ py_binary(
 py_binary(
     name = "hy-x-iqn-beliefs",
     srcs = [
-        "src/hy_x_iqn_beliefs.py",
+        "hy_x_iqn_beliefs.py",
     ],
     data = [
         "//configuration/database",
@@ -234,7 +256,7 @@ py_binary(
         "../bark_ml/python_wrapper",
         "../python/",
     ],
-    main = "src/hy_x_iqn_beliefs.py",
+    main = "hy_x_iqn_beliefs.py",
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
