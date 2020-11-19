@@ -26,6 +26,7 @@ from bark_ml.environments.blueprints import \
 from bark_ml.environments.single_agent_runtime import SingleAgentRuntime
 import bark_ml.environments.gym
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent import IQNAgent, FQFAgent, QRDQNAgent
+from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 
 from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
 
@@ -34,11 +35,12 @@ class EvaluationTests(unittest.TestCase):
   def test_agent_wrapping(self):
     params = ParameterServer()
     env = gym.make("highway-v1", params=params)
+    env._observer = NearestAgentsObserver(params)
     env.reset()
     params["ML"]["BaseAgent"]["MaxEpisodeSteps"] = 2
     params["ML"]["BaseAgent"]["NumEvalEpisodes"] = 2
     train_bench = TrainingBenchmarkDatabase()
-    agent = FQFAgent(env=env, params=params, training_benchmark=train_bench)
+    agent = FQFAgent(env=env, params=params, agent_save_dir="./temp_save", training_benchmark=train_bench)
     agent.train_episode()
     agent.evaluate()
 
