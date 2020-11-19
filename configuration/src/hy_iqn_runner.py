@@ -43,7 +43,7 @@ def configure_args(parser=None):
 
 def configure_agent(params, env):
     agent_save_dir = os.path.join(params["Experiment"]["dir"], "agent")
-    training_benchmark = TrainingBenchmarkDatabase()
+    training_benchmark = None #TrainingBenchmarkDatabase()
     agent = IQNAgent(env=env, params=params, agent_save_dir=agent_save_dir, training_benchmark=training_benchmark)
     return agent
 

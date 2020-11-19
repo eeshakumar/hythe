@@ -65,6 +65,7 @@ py_binary(
         "@hythe//libs/experiments:experiment",
         "@planner_uct//bark_mcts/runtime/scenario:config_readers",
         "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
+        "@hythe//libs/evaluation:evaluation",
     ],
 )
 
@@ -142,5 +143,6 @@ py_binary(
         "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
         "@hythe//libs/observer:belief_observer",
         "//configuration/src/common:common",
+        "@hythe//libs/evaluation:evaluation",
     ],
 )
