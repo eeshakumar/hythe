@@ -54,7 +54,7 @@ def configure_params(params, seed=None):
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
     params["Experiment"]["num_episodes"] = 50000
-    params["Experiment"]["num_scenarios"] = 500
+    params["Experiment"]["num_scenarios"] = 1000
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -118,7 +118,7 @@ def main():
 
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
-                             num_serialize_scenarios=500)
+                             num_serialize_scenarios=1000)
     dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
     local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
@@ -131,7 +131,7 @@ def main():
                             observer=observer,
                             viewer=viewer,
                             render=is_local)
-
+    
     run(params, env)
     params.Save(params_filename)
     logging.info('-' * 60)

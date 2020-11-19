@@ -36,9 +36,9 @@
             "MaxNumAgents":2
         },
         "BeliefObserver": {
-            "EnableThreshold": true,
+            "EnableThreshold": false,
             "Threshold": 0.05,  
-            "Discretize": true,
+            "Discretize": false,
             "NumBuckets": 16
         },
         "NearestAgentsObserver":{
@@ -65,12 +65,12 @@
             "Gamma":0.99,
             "Multi_step":1,
             "Update_interval":4,
-            "TargetUpdateInterval":100,
+            "TargetUpdateInterval":10000,
             "StartSteps":5000,
             "EpsilonTrain":0.01,
             "EpsilonEval":0.001,
             "EpsilonDecaySteps":25000,
-            "Double_q_learning":true,
+            "Double_q_learning":false,
             "DuelingNet":true,
             "NoisyNet":false,
             "Use_per":true,

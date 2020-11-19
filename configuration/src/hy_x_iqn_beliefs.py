@@ -132,7 +132,7 @@ def main():
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
     observer = BeliefObserver(params, hypothesis_set, splits=splits)
-    behavior = BehaviorDiscreteMacroActionsML(params_behavior)
+    behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
 
     viewer = MPViewer(params=params,
