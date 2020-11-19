@@ -1,4 +1,6 @@
 import os
+from copy import deepcopy
+import numpy as np
 import unittest
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
 
@@ -23,61 +25,45 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
 class HyBeliefObserverTests(unittest.TestCase):
 
-    # @timer
-    def test_belief_observer(self):
-        dir_prefix=""
-        params = ParameterServer(
-            filename="configuration/params/fqf_params.json")
-        params["Experiment"]["dir"] = "output/tests"
-        params["ML"]["BaseAgent"]["SummaryPath"] = os.path.join(params["Experiment"]["dir"], "agent/summaries")
-        params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(params["Experiment"]["dir"], "agent/checkpoints")
-        # params_scenario_generation = ParameterServer(filename="configuration/database/scenario_sets/interaction_merging_light_dense_behavior_space_default.json")
-        splits = 8
-        params_behavior = ParameterServer(
-            filename="configuration/params/1D_desired_gap_no_prior.json")
-        behavior_space = BehaviorSpace(params_behavior)
-        hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+    def test_thresholding(self):
+        params = ParameterServer()
+        # init behavior space
+        splits = 2
+        behavior_params = ParameterServer()
+        behavior_space = BehaviorSpace(behavior_params)
+        hypothesis_set, _ = behavior_space.create_hypothesis_set_fixed_split(split=splits)
         observer = BeliefObserver(params, hypothesis_set, splits=splits)
-        behavior = BehaviorDiscreteMacroActionsML(params_behavior)
-        evaluator = GoalReached(params)
-        # scenario_generation = ConfigurableScenarioGeneration(num_scenarios=2, params=params_scenario_generation)
-        viewer = MPViewer(params=params,
-                          x_range=[-35, 35],
-                          y_range=[-35, 35],
-                          follow_agent_id=True)
+        observer.is_enable_threshold = True
+        
+        belief_arr = np.linspace(0, 1, 100)
+        belief_arr_copy = deepcopy(belief_arr)
+        th_belief_arr = observer.threshold_beliefs(belief_arr)
+        belief_arr_copy[belief_arr_copy <= observer.threshold] = 0.
 
-        # database creation
-        dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
-                                 num_serialize_scenarios=2)
-        dbs.process(os.path.join(dir_prefix, "configuration/database"),
-                    filter_sets="interaction_merging_light_dense_1D")
-        local_release_filename = dbs.release(version="test", sub_dir="hy_bark_packaged_databases")
-        db = BenchmarkDatabase(database_root=local_release_filename)
-        scenario_generator, _, _ = db.get_scenario_generator(0)
-        env = HyDiscreteHighway(params=params,
-                                scenario_generation=scenario_generator,
-                                behavior=behavior,
-                                evaluator=evaluator,
-                                observer=observer,
-                                viewer=viewer,
-                                render=False)
-        max_num_agents = observer._max_num_vehicles
-        assert max_num_agents * len(hypothesis_set) == observer.max_beliefs
-        agent = FQFAgent(env=env, test_env=env, params=params)
-        done = False
-        i = 0
-        env.reset()
-        while i<100:
-            action = agent.explore()
-            obs, reward, done, _ = agent.env.step(action)
-            i += 1
-
-        print("Num actions", i)
+        self.assertTrue(all(belief_arr_copy == th_belief_arr))
 
 
-# import cProfile
+    def test_discretization(self):
+        params = ParameterServer()
+        # init behavior space
+        splits = 2
+        behavior_params = ParameterServer()
+        behavior_space = BehaviorSpace(behavior_params)
+        hypothesis_set, _ = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+        observer = BeliefObserver(params, hypothesis_set, splits=splits)
+        observer.is_discretize = True
+        
+        belief_arr = np.linspace(0, 1, 100)
+        belief_arr_copy = deepcopy(belief_arr)
+
+        o_bucketized = observer.discretize_beliefs(belief_arr)
+
+        bins_idxs = np.digitize(belief_arr_copy, observer.buckets, right=observer.is_ciel)
+        self.assertEqual(bins_idxs.shape[0], belief_arr_copy.shape[0])
+        bucketized = observer.buckets[bins_idxs]
+
+        self.assertTrue(all(o_bucketized == bucketized))
 
 
 if __name__ == '__main__':
-  # cProfile.run('unittest.main()')
     unittest.main()
