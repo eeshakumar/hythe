@@ -36,6 +36,8 @@ from bark.runtime.scenario.scenario_generation.configurable_scenario_generation 
   import add_config_reader_module
 add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 
+from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
+
 
 is_local = False
 
@@ -50,7 +52,8 @@ def configure_args(parser=None):
 
 def configure_agent(params, env):
     agent_save_dir = os.path.join(params["Experiment"]["dir"], "agent")
-    agent = IQNAgent(env=env, params=params, agent_save_dir=agent_save_dir)
+    training_benchmark = TrainingBenchmarkDatabase()
+    agent = IQNAgent(env=env, params=params, agent_save_dir=agent_save_dir, training_benchmark=training_benchmark)
     return agent
 
 
