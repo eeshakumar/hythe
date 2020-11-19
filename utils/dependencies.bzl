@@ -39,3 +39,10 @@ cc_library(
         path = "/home/ekumar/master_thesis/code/fqf-iqn-qrdqn.pytorch",
         build_file = "//:utils/BUILD.fqn",
     )
+
+    # _maybe(
+    #     git_repository,
+    #     name = "mamcts_project",
+    #     commit="eccbaf1596a8cc68b0c5ae38dbbaa6cc11827553",
+    #     remote = "https://github.com/juloberno/mamcts",
+    # )

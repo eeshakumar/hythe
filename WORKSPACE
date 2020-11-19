@@ -8,7 +8,7 @@ hythe_deps()
 # -------- BARK Dependency -------------
 git_repository(
     name = "bark_project",
-    commit = "b9c6b567e7b86fc56df16bd876172904868bc576",
+    commit = "e17cbe724ef9e67ae169e889f547ea6313ed8b16",
     remote = "https://github.com/juloberno/bark",
 )
 
@@ -24,8 +24,8 @@ boost_deps()
 # ------ Planner UCT ------------------------------
 git_repository(
     name = "planner_uct",
-    commit = "d42b19e46e52bd2f7ca0ce92b4376b1ec0507286",
-    remote = "https://github.com/juloberno/bark_hypothesis_uct",
+    commit = "ee6faee750ec51e72f1d6f3514aae45aa57aaca4",
+    remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
     #path="/home/julo/development/bark_hypothesis_uct"
 )
 
@@ -50,29 +50,47 @@ benchmark_database_release()
 # --------------------------------------------------
 
 # -------- Bark ML -----------------------
-local_repository(
+git_repository(
     name = "bark_ml_project",
-  #  commit = "616648e0b94bfb3e8581357f59ff321cb0c43e88",
-  #  remote = "https://github.com/eeshakumar/bark-ml",
-  path = "/home/julo/development/bark-ml"
- # remote = "https://github.com/bark-simulator/bark-ml",
+    commit = "62830ef016ccb32685400f6b7e493e84611fbb1f",
+    remote = "https://github.com/eeshakumar/bark-ml",
+    # path = "/home/ekumar/master_thesis/code/bark-ml",
 )
 
-load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
-load("@benchmark_database//load:load.bzl", "benchmark_database_release")
+# load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
+# load("@benchmark_database//load:load.bzl", "benchmark_database_release")
 
-benchmark_database_dependencies()
+# benchmark_database_dependencies()
 
-benchmark_database_release()
+# benchmark_database_release()
 # --------------------------------------------------
 
-load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
-load("@benchmark_database//load:load.bzl", "benchmark_database_release")
+# load("@benchmark_database//util:deps.bzl", "benchmark_database_dependencies")
+# load("@benchmark_database//load:load.bzl", "benchmark_database_release")
 
-benchmark_database_dependencies()
+# benchmark_database_dependencies()
 
-benchmark_database_release()
+# benchmark_database_release()
 
-load("@planner_uct//util:deps.bzl", "planner_uct_rules_dependencies")
+# load("@planner_uct//util:deps.bzl", "planner_uct_rules_dependencies")
 
-planner_uct_rules_dependencies()
+# planner_uct_rules_dependencies()
+
+# -------- MA MCTS -----------------------
+
+git_repository(
+    name = "mamcts_project",
+    commit="eccbaf1596a8cc68b0c5ae38dbbaa6cc11827553",
+    remote = "https://github.com/juloberno/mamcts"
+)
+
+# --------------------------------------------------
+
+# Google or tools for mamcts -----------------------------
+load("@mamcts_project//util:deps_or.bzl", "google_or_dependencies")
+google_or_dependencies()
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+# Load common dependencies.
+protobuf_deps()
+
