@@ -88,7 +88,7 @@ def run(params, env, exp_exists):
         agent.load_models(agent_checkpoint_last)
       else:
         print("No checkpoint written.")
-    exp = Experiment(params=params, agent=agent)
+    exp = Experiment(params=params, agent=agent, dump_scenario_interval=10000)
     exp.run()
 
 def check_if_exp_exists(params):
