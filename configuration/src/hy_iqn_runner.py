@@ -33,8 +33,8 @@ from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabas
 is_local = False
 
 if is_local:
-  num_episodes = 1000
-  num_scenarios = 20
+  num_episodes = 10000
+  num_scenarios = 200
 else:
   num_episodes = 50000
   num_scenarios = 1000

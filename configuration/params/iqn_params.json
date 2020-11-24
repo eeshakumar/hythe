@@ -127,7 +127,7 @@
     },
     "BehaviorIDMClassic":{
         "MinimumSpacing":2.0,
-        "DesiredTimeHeadway":1.5
+        "DesiredTimeHeadway":1.5,
         "MaxAcceleration":1.7000000476837158,
         "AccelerationLowerBound":-5.0,
         "AccelerationUpperBound":8.0,
