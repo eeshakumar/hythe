@@ -32,6 +32,13 @@ from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabas
 
 is_local = False
 
+if is_local:
+  num_episodes = 1000
+  num_scenarios = 20
+else:
+  num_episodes = 50000
+  num_scenarios = 1000
+
 
 def configure_args(parser=None):
     if parser is None:
@@ -56,8 +63,8 @@ def configure_params(params, seed=None):
     Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
     params["Experiment"]["params"] = "params_{}_{}.json"
     params["Experiment"]["scenarios_generated"] = "scenarios_list_{}_{}"
-    params["Experiment"]["num_episodes"] = 50000
-    params["Experiment"]["num_scenarios"] = 1000
+    params["Experiment"]["num_episodes"] = num_episodes
+    params["Experiment"]["num_scenarios"] = num_scenarios
     params["Experiment"]["map_filename"] = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
     return params
 
@@ -71,7 +78,7 @@ def run(params, env, exp_exists=False):
         agent.load_models(agent_checkpoint_last)
       else:
         print("No checkpoint written.") 
-    exp = Experiment(params=params, agent=agent, dump_scenario_interval=10000)
+    exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
     exp.run()
 
 
@@ -121,7 +128,7 @@ def main():
 
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
-                             num_serialize_scenarios=1000)
+                             num_serialize_scenarios=num_scenarios)
     dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
     local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
@@ -134,7 +141,7 @@ def main():
                             observer=observer,
                             viewer=viewer,
                             render=is_local)
-    
+    assert env.action_space._n == 8, "Action Space is incorrect!"
     run(params, env, exp_exists)
     params.Save(params_filename)
     logging.info('-' * 60)
