@@ -33,7 +33,7 @@
                 6.283185307179586
             ],
             "NormalizationEnabled":true,
-            "MaxNumAgents":2
+            "MaxNumAgents":4
         },
         "BeliefObserver": {
             "EnableThreshold": false,
@@ -51,28 +51,28 @@
         },
         "IQNAgent":{
             "N_dash":64,
-            "N":64,
+            "N":32,
             "Kappa":1.0,
-            "LearningRate":5e-5,
+            "LearningRate":5e-6,
             "NumCosines":64
         },
         "BaseAgent":{
             "SummaryPath":"",
             "CheckpointPath":"",
             "NumSteps":50000000,
-            "BatchSize": 512,
+            "BatchSize": 4,
             "MemorySize":100000,
             "Gamma":0.99,
-            "Multi_step":1,
+            "Multi_step":4,
             "Update_interval":4,
             "TargetUpdateInterval":100,
-            "StartSteps":500,
-            "EpsilonTrain":0.01,
-            "EpsilonEval":0.001,
+            "StartSteps":50,
+            "EpsilonTrain":0.1,
+            "EpsilonEval":0.01,
             "EpsilonDecaySteps":25000,
             "Double_q_learning":true,
             "DuelingNet":true,
-            "NoisyNet":true,
+            "NoisyNet":false,
             "Use_per":true,
             "SummaryLogInterval": 100,
             "RewardLogInterval": 100,
@@ -82,6 +82,13 @@
             "GradCliping":5.0,
             "Cuda":true,
             "Seed":0
+        },
+        "DemonstratorAgent":{
+            "Buffer": {
+                "epsilon_d": 1.0,
+                "epsilon_alpha": 0.001,
+                "demo_capacity_ratio": 1.0
+            }
         },
         "BehaviorMPMacroActions": {
             "BehaviorMPMacroActions": {
