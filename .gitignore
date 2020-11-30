@@ -1,3 +1,6 @@
+# Logs by bazel
+logs/
+
 # Prerequisites
 *.d
 
