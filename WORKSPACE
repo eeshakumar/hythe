@@ -52,7 +52,7 @@ benchmark_database_release()
 # -------- Bark ML -----------------------
 git_repository(
     name = "bark_ml_project",
-    commit = "f7c058e572e47599888de7143bf1d298665ea3e9",
+    commit = "e6e29f4542ba38e0c621bb2282cc1604711b77f1",
     remote = "https://github.com/eeshakumar/bark-ml",
     # path = "/home/ekumar/master_thesis/code/bark-ml",
 )
