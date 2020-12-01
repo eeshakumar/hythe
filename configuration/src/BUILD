@@ -146,3 +146,40 @@ py_binary(
         "@hythe//libs/evaluation:evaluation",
     ],
 )
+
+py_binary(
+    name = "hy-iqnfd-exp",
+    srcs = [
+        "hy_iqnfd_runner.py",
+    ],
+    data = [
+        "//configuration/database",
+        "//configuration/params:hy_params",
+        "@bark_ml_project//bark_ml:generate_core",
+        "@bark_project//bark:generate_core",
+        "@fqn//:fqn_config",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_ml/",
+        "../bark_ml/python_wrapper",
+        "../python/",
+    ],
+    main = "hy_iqnfd_runner.py",
+    deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
+        "@bark_project//bark/runtime/viewer:py_viewer",
+        "@benchmark_database//load:benchmark_database",
+        "@benchmark_database//serialization:database_serializer",
+        "@fqn//:pylib_fqn",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/experiments:experiment",
+        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
+        "@hythe//libs/evaluation:evaluation",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent/demonstrations:demonstrations"
+    ],
+)

@@ -93,12 +93,15 @@ class Experiment(object):
             self.save(episode_num)
         return
 
-    def run(self, only_one=False):
+    def run(self, only_one=False, demonstrator=False):
         if only_one:
             self.run_single_episode()
         else:
-            for i in range(1, self.num_episodes + 1):
-                self.run_single_episode(i)
+            if demonstrator:
+              self._agent.run()
+            else:
+              for i in range(1, self.num_episodes + 1):
+                  self.run_single_episode(i)
 
     @staticmethod
     def restore_env(params, blueprint):

@@ -53,20 +53,20 @@
             "N_dash":64,
             "N":32,
             "Kappa":1.0,
-            "LearningRate":5e-6,
+            "LearningRate":5e-5,
             "NumCosines":64
         },
         "BaseAgent":{
             "SummaryPath":"",
             "CheckpointPath":"",
             "NumSteps":50000000,
-            "BatchSize": 4,
+            "BatchSize": 512,
             "MemorySize":100000,
             "Gamma":0.99,
             "Multi_step":4,
             "Update_interval":4,
-            "TargetUpdateInterval":100,
-            "StartSteps":50,
+            "TargetUpdateInterval":10000,
+            "StartSteps":5000,
             "EpsilonTrain":0.1,
             "EpsilonEval":0.01,
             "EpsilonDecaySteps":25000,
@@ -85,9 +85,19 @@
         },
         "DemonstratorAgent":{
             "Buffer": {
-                "epsilon_d": 1.0,
+                "epsilon_demo": 1.0,
                 "epsilon_alpha": 0.001,
-                "demo_capacity_ratio": 1.0
+                "demo_capacity_ratio": 1.0,
+                "alpha": 0.4,
+                "per_beta_steps": 75000,
+                "per_beta": 0.6
+            },
+            "Loss": {
+                "expert_margin": 0.8
+            },
+            "Agent": {
+                "num_demo_episodes": 100,
+                "save_demo": "demonstrations"
             }
         },
         "BehaviorMPMacroActions": {
