@@ -8,7 +8,7 @@ hythe_deps()
 # -------- BARK Dependency -------------
 git_repository(
     name = "bark_project",
-    commit = "e17cbe724ef9e67ae169e889f547ea6313ed8b16",
+    commit = "a78dd0c08af057cadde62ffede2b8e997f5e435f",
     remote = "https://github.com/juloberno/bark",
 )
 
@@ -52,7 +52,7 @@ benchmark_database_release()
 # -------- Bark ML -----------------------
 git_repository(
     name = "bark_ml_project",
-    commit = "76c3dbd7db1559934a475c105aef95311492560d",
+    commit = "f7c058e572e47599888de7143bf1d298665ea3e9",
     remote = "https://github.com/eeshakumar/bark-ml",
     # path = "/home/ekumar/master_thesis/code/bark-ml",
 )
