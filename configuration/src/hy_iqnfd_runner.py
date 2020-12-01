@@ -35,7 +35,7 @@ is_local = True
 
 if is_local:
   num_episodes = 10
-  num_scenarios = 10
+  num_scenarios = 5
 else:
   num_episodes = 50000
   num_scenarios = 1000
