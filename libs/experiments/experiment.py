@@ -93,12 +93,13 @@ class Experiment(object):
             self.save(episode_num)
         return
 
-    def run(self, only_one=False, demonstrator=False):
+    def run(self, only_one=False, demonstrations=None, demonstrator=False):
         if only_one:
             self.run_single_episode()
         else:
             if demonstrator:
-              self._agent.run()
+              assert demonstrations is not None
+              self._agent.learn_from_demonstrations(demonstrations)
             else:
               for i in range(1, self.num_episodes + 1):
                   self.run_single_episode(i)
