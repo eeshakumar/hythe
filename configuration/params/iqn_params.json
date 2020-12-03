@@ -87,7 +87,7 @@
             "Buffer": {
                 "epsilon_demo": 1.0,
                 "epsilon_alpha": 0.001,
-                "demo_capacity_ratio": 1.0,
+                "demo_ratio": 0.25,
                 "alpha": 0.4,
                 "per_beta_steps": 75000,
                 "per_beta": 0.6
@@ -96,7 +96,7 @@
                 "expert_margin": 0.8
             },
             "Agent": {
-                "num_demo_episodes": 4,
+                "num_demo_episodes": 10,
                 "save_demo": "demonstrations",
                 "online_gradient_update_steps": 10
             }
