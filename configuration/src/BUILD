@@ -180,6 +180,7 @@ py_binary(
         "@planner_uct//bark_mcts/runtime/scenario:config_readers",
         "@planner_uct//bark_mcts/runtime/scenario:scenario_set_generation",
         "@hythe//libs/evaluation:evaluation",
-        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent/demonstrations:demonstrations"
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent/demonstrations:demonstrations",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/tests:test_demo_behavior",
     ],
 )
