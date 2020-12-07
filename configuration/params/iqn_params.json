@@ -96,9 +96,9 @@
                 "expert_margin": 0.8
             },
             "Agent": {
-                "num_demo_episodes": 10,
+                "num_demo_episodes": 6,
                 "save_demo": "demonstrations",
-                "online_gradient_update_steps": 10
+                "online_gradient_update_steps": 50
             }
         },
         "BehaviorMPMacroActions": {
