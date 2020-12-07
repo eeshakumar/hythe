@@ -39,7 +39,7 @@ is_local = True
 
 if is_local:
   num_episodes = 10
-  num_scenarios = 5
+  num_scenarios = 6
   num_demo_episodes = 4
 else:
   num_episodes = 50000
@@ -138,7 +138,7 @@ def run(params, env, exp_exists=False):
     eval_criteria = {"goal_r1" : lambda x : x}
     demonstrations = generate_demonstrations(params, env, eval_criteria)
     exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
-    exp.run(demonstrator=True, demonstrations=demonstrations)
+    exp.run(demonstrator=True, demonstrations=demonstrations, learn_only=True)
 
 
 def check_if_exp_exists(params):
@@ -150,7 +150,7 @@ def main():
     if is_local:
         dir_prefix = ""
     else:
-        dir_prefix="hy-iqn-exp.runfiles/hythe/"
+        dir_prefix="hy-iqnfd-exp.runfiles/hythe/"
     print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
     params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params.json"),
