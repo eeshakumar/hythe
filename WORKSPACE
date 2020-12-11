@@ -24,8 +24,8 @@ boost_deps()
 # ------ Planner UCT ------------------------------
 git_repository(
     name = "planner_uct",
-    commit = "ee6faee750ec51e72f1d6f3514aae45aa57aaca4",
-    remote = "https://github.com/eeshakumar/bark_hypothesis_uct",
+    commit = "693aab72b72d43895fb62016e73bf3df29e21253",
+    remote = "https://github.com/juloberno/bark_hypothesis_uct",
     #path="/home/julo/development/bark_hypothesis_uct"
 )
 
@@ -52,7 +52,7 @@ benchmark_database_release()
 # -------- Bark ML -----------------------
 git_repository(
     name = "bark_ml_project",
-    commit = "cd1f9f524e8e1c33648b39e1a8284a02a6b68f47",
+    commit = "00004015da4baa7b2a8d87a1a113f9d46ff7076a",
     remote = "https://github.com/eeshakumar/bark-ml",
     # path = "/home/ekumar/master_thesis/code/bark-ml",
 )
