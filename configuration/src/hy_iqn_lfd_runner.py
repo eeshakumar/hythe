@@ -38,7 +38,7 @@ from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.\
 is_local = True
 
 if is_local:
-  num_episodes = 10
+  num_episodes = 100
   num_scenarios = 5
   # num_demo_episodes = 4
 else:
@@ -121,7 +121,7 @@ def run(params, env, exp_exists=False):
     # eval_criteria = {"goal_r1" : lambda x : x}
     # demonstrations = generate_demonstrations(params, env, eval_criteria)
     exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
-    exp.run(demonstrator=True, demonstrations=None)
+    exp.run(demonstrator=True, demonstrations=None, num_episodes=num_episodes)
 
 
 def check_if_exp_exists(params):
@@ -136,20 +136,21 @@ def main():
         dir_prefix="hy-iqn-lfd-exp.runfiles/hythe/"
     print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params.json"),
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params_demo.json"),
                              log_if_default=True)
     params = configure_params(params, seed=args.jobname)
+    print(params["Experiment"]["num_episodes"])
     experiment_id = params["Experiment"]["random_seed"]
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
 
     # check if exp exists and handle preemption
-    exp_exists = check_if_exp_exists(params)
-    if exp_exists:
-      print("Loading existing experiment from: {}".format(args.jobname, (params["Experiment"]["dir"])))
-      if os.path.isfile(params_filename):
-        params = ParameterServer(filename=params_filename, log_if_default=True)
-    else:
-      Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)  
+    # exp_exists = check_if_exp_exists(params)
+    # if exp_exists:
+    #   print("Loading existing experiment from: {}".format(args.jobname, (params["Experiment"]["dir"])))
+    #   if os.path.isfile(params_filename):
+    #     params = ParameterServer(filename=params_filename, log_if_default=True)
+    # else:
+    #   Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)  
 
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -182,9 +183,9 @@ def main():
                             evaluator=evaluator,
                             observer=observer,
                             viewer=viewer,
-                            render=True)
+                            render=False)
     assert env.action_space._n == 8, "Action Space is incorrect!"
-    run(params, env, exp_exists)
+    run(params, env)
     params.Save(params_filename)
     logging.info('-' * 60)
     logging.info("Writing params to :{}".format(params_filename))

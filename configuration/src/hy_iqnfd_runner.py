@@ -1,3 +1,8 @@
+try:
+  import debug_settings
+except:
+  pass
+
 from argparse import ArgumentParser
 from datetime import datetime
 import logging
@@ -5,6 +10,8 @@ import os
 from pathlib import Path
 from sys import argv
 import yaml
+
+from bark.core.models.behavior import *
 
 from hythe.libs.experiments.experiment import Experiment
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
@@ -39,41 +46,12 @@ is_local = True
 
 if is_local:
   num_episodes = 10
-  num_scenarios = 6
-  num_demo_episodes = 4
+  num_scenarios = 10
+  num_demo_episodes = num_scenarios
 else:
   num_episodes = 50000
-  num_scenarios = 1000
+  num_scenarios = 10000
   num_demo_episodes = 1000
-
-
-# TODO: Remove this evaluator
-from bark_ml.evaluators.evaluator import StateEvaluator
-class TestEvaluator(StateEvaluator):
-  reach_goal = True
-  def __init__(self,
-              params=ParameterServer()):
-    StateEvaluator.__init__(self, params)
-    self.step = 0
-
-  def _evaluate(self, observed_world, eval_results, action):
-    """Returns information about the current world state
-    """
-    done = False
-    reward = 0.0
-    info = {"goal_r1" : False}
-    if self.step > 2:
-      done = True
-      if self.reach_goal:
-        reward = 0.1
-        info = {"goal_r1" : True}
-    self.step += 1
-    return reward, done, info
-
-  def Reset(self, world):
-    self._step = 0
-    #every second scenario goal is not reached
-    TestEvaluator.reach_goal = not TestEvaluator.reach_goal
 
 
 def configure_args(parser=None):
@@ -92,22 +70,25 @@ def configure_agent(params, env):
     return agent
 
 
-def generate_demonstrations(params, env, eval_criteria, demo_behavior=None):
-    # TODO: Real objects need not be copied this way. Demo env can be created new.
-    real_behavior = env._ml_behavior
-    real_evaluator = env._evaluator
-    env._evaluator = TestEvaluator()
-    demo_behavior = TestDemoBehavior(params)
+def generate_demonstrations(params, env, eval_criteria, demo_behavior=None, use_mp_runner=True):
     demo_collector = DemonstrationCollector()
     save_dir = os.path.join(params["Experiment"]["dir"], "demonstrations")
     demo_generator = DemonstrationGenerator(env, params, demo_behavior, demo_collector, save_dir)
     if not os.path.exists(save_dir):
       os.makedirs(save_dir)
-    demo_generator.generate_demonstrations(num_demo_episodes, eval_criteria, save_dir)
+    demo_generator.generate_demonstrations(num_demo_episodes, eval_criteria, save_dir, use_mp_runner=False)
     demo_generator.dump_demonstrations(save_dir)
-    env._evaluator = real_evaluator
-    env._ml_behavior = real_behavior
     return demo_generator.demonstrations
+
+
+def generate_uct_hypothesis_behavior():
+    ml_params = ParameterServer(filename="configuration/params/iqn_params_demo.json", log_if_default=True)
+    behavior_ml_params = ml_params["ML"]["BehaviorMPMacroActions"]
+    mcts_params = ParameterServer(filename="configuration/params/default_uct_params.json", log_if_default=True)
+    mcts_params["BehaviorUctBase"]["EgoBehavior"] = behavior_ml_params
+    behavior = BehaviorUCTHypothesis(mcts_params, [])
+    mcts_params.Save(filename="./default_uct_params.json")
+    return behavior, mcts_params
 
 
 def configure_params(params, seed=None):
@@ -125,18 +106,15 @@ def configure_params(params, seed=None):
 
 
 def run(params, env, exp_exists=False):
-    agent = configure_agent(params, env)
-    if exp_exists:
-      agent_checkpoint_last = os.path.join(params["Experiment"]["dir"], "agent/checkpoints/best")
-      if os.path.isdir(agent_checkpoint_last):
-        print("Loading from last best checkpoint.")
-        agent.load_models(agent_checkpoint_last)
-      else:
-        print("No checkpoint written.")
 
-    #TODO: Revisit this criteria
-    eval_criteria = {"goal_r1" : lambda x : x}
-    demonstrations = generate_demonstrations(params, env, eval_criteria)
+    # add an eval criteria and generate demonstrations
+    eval_criteria = {"goal_reached" : lambda x : x}
+    demo_behavior, mcts_params = generate_uct_hypothesis_behavior()
+    demonstrations = generate_demonstrations(params, env, eval_criteria, demo_behavior)
+
+    # Assign capacity by length of demonstrations
+    params["ML"]["BaseAgent"]["MemorySize"] = len(demonstrations)
+    agent = configure_agent(params, env)
     exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
     exp.run(demonstrator=True, demonstrations=demonstrations, learn_only=True)
 
@@ -153,20 +131,11 @@ def main():
         dir_prefix="hy-iqnfd-exp.runfiles/hythe/"
     print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
-    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params.json"),
+    params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params_demo.json"),
                              log_if_default=True)
     params = configure_params(params, seed=args.jobname)
     experiment_id = params["Experiment"]["random_seed"]
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
-
-    # check if exp exists and handle preemption
-    exp_exists = check_if_exp_exists(params)
-    if exp_exists:
-      print("Loading existing experiment from: {}".format(args.jobname, (params["Experiment"]["dir"])))
-      if os.path.isfile(params_filename):
-        params = ParameterServer(filename=params_filename, log_if_default=True)
-    else:
-      Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)  
 
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -201,7 +170,7 @@ def main():
                             viewer=viewer,
                             render=True)
     assert env.action_space._n == 8, "Action Space is incorrect!"
-    run(params, env, exp_exists)
+    run(params, env)
     params.Save(params_filename)
     logging.info('-' * 60)
     logging.info("Writing params to :{}".format(params_filename))
