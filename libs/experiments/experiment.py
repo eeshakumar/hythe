@@ -94,13 +94,14 @@ class Experiment(object):
         return
 
     def run(self, only_one=False, demonstrations=None, demonstrator=False,
-            learn_only=False):
+            learn_only=False, num_episodes=50000):
         if only_one:
             self.run_single_episode()
         else:
             if demonstrator:
               assert not learn_only or demonstrations is not None
-              self._agent.learn_from_demonstrations(demonstrations, learn_only=learn_only)
+              self._agent.learn_from_demonstrations(demonstrations, learn_only=learn_only,
+                                                    num_episodes=num_episodes)
             else:
               for i in range(1, self.num_episodes + 1):
                   self.run_single_episode(i)
