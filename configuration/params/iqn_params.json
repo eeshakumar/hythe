@@ -36,10 +36,10 @@
             "MaxNumAgents":4
         },
         "BeliefObserver": {
-            "EnableThreshold": false,
+            "EnableThreshold": true,
             "Threshold": 0.05,  
-            "Discretize": false,
-            "NumBuckets": 16
+            "Discretize": true,
+            "NumBuckets": 64
         },
         "NearestAgentsObserver":{
             "MaxOtherDistance":100
@@ -93,7 +93,9 @@
                 "per_beta": 0.6
             },
             "Loss": {
-                "expert_margin": 0.8
+                "expert_margin": 0.8,
+                "l2_weight_decay": 0.5,
+                "supervised_margin_weight": 0.5
             },
             "Agent": {
                 "num_demo_episodes": 6,
