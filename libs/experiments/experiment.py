@@ -106,6 +106,9 @@ class Experiment(object):
               for i in range(1, self.num_episodes + 1):
                   self.run_single_episode(i)
 
+    def resume(self, num_episodes):
+      self.agent.train_episodes(num_episodes)
+
     @staticmethod
     def restore_env(params, blueprint):
         return HyDiscreteHighway(params=params, blueprint=blueprint)
