@@ -103,6 +103,21 @@ class BeliefObserver(NearestAgentsObserver):
         assert bin_idxs.shape[0] == beliefs_arr.shape[0]
         return self.buckets[bin_idxs]
 
+    def store_beliefs(self, filename):
+      # all_beliefs is a list of dictionaries
+      for belief in self.all_beliefs:
+        # each belief is a dictionary of agent_id: beliefs data
+        for agent in belief.keys():
+          if self.is_enabled_threshold:
+            belief[agent] = self.threshold_beliefs(np.asarray(belief[agent]))
+          if self.is_discretize:
+            belief[agent] = self.discretize_beliefs(belief[agent])
+      import pandas as pd
+      df = pd.DataFrame(self.all_beliefs)
+      print(f"Storing beliefs to {filename}")
+      df.to_pickle(filename)
+
+
     @property
     def max_num_agents(self):
         return self._max_num_vehicles
