@@ -43,10 +43,17 @@ from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.\
 
 
 is_local = True
+is_generate_demonstrations = False
+is_train_on_demonstrations = True
+
+capacity = 1000
+
+# default dir with demonstrations data
+demo_dir_default = "/mnt/glusterdata/home/ekumar/demonstrations/exp_aa3feb5b-f98e-4318-9bb8-c183eaad4c3a"
 
 if is_local:
-  num_episodes = 10
-  num_scenarios = 10
+  num_episodes = 100
+  num_scenarios = 1000
   num_demo_episodes = num_scenarios
 else:
   num_episodes = 50000
@@ -59,6 +66,8 @@ def configure_args(parser=None):
         parser = ArgumentParser()
     parser.add_argument('--mode', type=str, default="train")
     parser.add_argument("--jobname", type=str)
+    parser.add_argument("--grad_update_steps", type=int, default=750000)
+    parser.add_argument("--demodir", type=str, default=demo_dir_default)
     return parser.parse_args()
 
 
@@ -76,7 +85,7 @@ def generate_demonstrations(params, env, eval_criteria, demo_behavior=None, use_
     demo_generator = DemonstrationGenerator(env, params, demo_behavior, demo_collector, save_dir)
     if not os.path.exists(save_dir):
       os.makedirs(save_dir)
-    demo_generator.generate_demonstrations(num_demo_episodes, eval_criteria, save_dir, use_mp_runner=False)
+    demo_generator.generate_demonstrations(num_demo_episodes, eval_criteria, save_dir, use_mp_runner=True)
     demo_generator.dump_demonstrations(save_dir)
     return demo_generator.demonstrations
 
@@ -105,18 +114,38 @@ def configure_params(params, seed=None):
     return params
 
 
-def run(params, env, exp_exists=False):
+def unpack_load_demonstrations(demo_root):
+    demo_dir = os.path.join(demo_root, "demonstrations/generated_demonstrations")
+    collector = DemonstrationCollector.load(demo_dir)
+    return collector, collector.GetDemonstrationExperiences()
+
+
+def run(args, params, env, exp_exists=False):
 
     # add an eval criteria and generate demonstrations
-    eval_criteria = {"goal_reached" : lambda x : x}
-    demo_behavior, mcts_params = generate_uct_hypothesis_behavior()
-    demonstrations = generate_demonstrations(params, env, eval_criteria, demo_behavior)
-
-    # Assign capacity by length of demonstrations
-    params["ML"]["BaseAgent"]["MemorySize"] = len(demonstrations)
-    agent = configure_agent(params, env)
-    exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
-    exp.run(demonstrator=True, demonstrations=demonstrations, learn_only=True)
+    if is_generate_demonstrations:
+      eval_criteria = {"goal_reached" : lambda x : x}
+      demo_behavior, mcts_params = generate_uct_hypothesis_behavior()
+      demonstrations = generate_demonstrations(params, env, eval_criteria, demo_behavior)
+      print("Total demonstrations generated", len(demonstrations))
+    if is_train_on_demonstrations:
+      collector, demonstrations = unpack_load_demonstrations(args.demodir)
+      if params["ML"]["BaseAgent"]["Multi_step"] is not None:
+        multistep_capacity = capacity + params["ML"]["BaseAgent"]["Multi_step"] - 1 
+      if multistep_capacity < len(demonstrations):
+        demonstrations = demonstrations[:multistep_capacity]
+        print("Pruned number of demonstrations", len(demonstrations))
+      else:
+        print("Number of demonstrations under capacity requested, using full demonstrations")
+      print("Loaded number of demonstrations", len(demonstrations))
+      if is_local:
+        # Assign steps by args
+        params["ML"]["DemonstratorAgent"]["Agent"]["online_gradient_update_steps"] = args.grad_update_steps
+      # Assign capacity by length of demonstrations
+      params["ML"]["BaseAgent"]["MemorySize"] = capacity
+      agent = configure_agent(params, env)
+      exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
+      exp.run(demonstrator=True, demonstrations=demonstrations, num_episodes=num_episodes, learn_only=True)
 
 
 def check_if_exp_exists(params):
@@ -155,7 +184,7 @@ def main():
     logging.info('-' * 60)
 
     # database creation
-    dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
+    dbs = DatabaseSerializer(test_scenarios=1, test_world_steps=2,
                              num_serialize_scenarios=num_scenarios)
     dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
     local_release_filename = dbs.release(version="test")
@@ -168,9 +197,9 @@ def main():
                             evaluator=evaluator,
                             observer=observer,
                             viewer=viewer,
-                            render=True)
+                            render=False)
     assert env.action_space._n == 8, "Action Space is incorrect!"
-    run(params, env)
+    run(args, params, env)
     params.Save(params_filename)
     logging.info('-' * 60)
     logging.info("Writing params to :{}".format(params_filename))
