@@ -13,16 +13,12 @@ from argparse import ArgumentParser
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
 
-logging.info("Running on process with ID: {}".format(os.getpid()))
-import bark.core.commons
-
 from load.benchmark_database import BenchmarkDatabase
 from serialization.database_serializer import DatabaseSerializer
 from bark.benchmark.benchmark_runner_mp import BenchmarkRunnerMP, BenchmarkRunner
 from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
 from hythe.libs.observer.belief_observer import BeliefObserver
 from bark_ml.evaluators.goal_reached import GoalReached
-from bark_ml.environments.single_agent_runtime import SingleAgentRuntime
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 
 
@@ -35,6 +31,8 @@ import bark.core.models.behavior
 from bark.core.models.dynamic import StateDefinition
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent import IQNAgent
+from hythe.libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
+from hythe.libs.environments.gym import HyDiscreteHighway, GymSingleAgentRuntime
 
 
 from bark.runtime.commons.parameters import ParameterServer
@@ -49,7 +47,7 @@ logging.info("Logging into: {}".format(log_folder))
 bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 
 # reduced max steps and scenarios for testing
-max_steps = 100
+max_steps = 10000
 num_scenarios = 100
 
 
@@ -63,9 +61,9 @@ logging.getLogger().setLevel(logging.INFO)
 
 print("Experiment server at :", os.getcwd())
 
-dbs = DatabaseSerializer(test_scenarios=num_scenarios, test_world_steps=20, num_serialize_scenarios=num_scenarios)
-dbs.process("configuration/database", filter_sets="**/**/interaction_merging_mid_dense_1D_new.json")
-local_release_filename = dbs.release(version="tmp2_md")
+dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=20, num_serialize_scenarios=num_scenarios)
+dbs.process("configuration/database", filter_sets="**/**/interaction_merging_light_dense_1D.json")
+local_release_filename = dbs.release(version="tmp2")
 
 db = BenchmarkDatabase(database_root=local_release_filename)
 scenario_generator, _, _ = db.get_scenario_generator(0)
@@ -79,7 +77,7 @@ exp_dir = args.checkpoint_dir
 is_belief_observer = args.belief_observer
 
 if exp_dir is None:
-  exp_dir = "/home/ekumar/master_thesis/results/training/december/iqn/exp_iqn_lbnw"
+  exp_dir = "/home/ekumar/master_thesis/results/training/december/iqn/exp_iqn_default"
 print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
@@ -89,47 +87,20 @@ params["ML"]["BaseAgent"]["CheckpointPath"] = os.path.join(exp_dir, "agent/check
 
 # load belief observer specifics
 if is_belief_observer:
-  splits = 2
+  splits = 8
   behavior_params_filename = glob.glob(os.path.join(exp_dir, "behavior_params*"))[0]
   params_behavior = ParameterServer(filename=behavior_params_filename, log_if_default=True)
   behavior_space = BehaviorSpace(params_behavior)
 
   hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
   observer = BeliefObserver(params, hypothesis_set, splits=splits)
-  behavior = BehaviorDiscreteMacroActionsML(params)
+  behavior = BehaviorDiscreteMacroActionsML(params_behavior)
 # if not, load default observer
 else:
   behavior = BehaviorDiscreteMacroActionsML(params)
   observer = NearestAgentsObserver(params)
 
-# load env
-env_to_pass_observer_behavior = SingleAgentRuntime(ml_behavior=behavior,
-                                                  observer=observer,
-                                                  step_time=-1.0,
-                                                  viewer=-1.0,
-                                                  scenario_generator=-1.0,
-                                                  evaluator=-1.0)
-
-# agent saved directory
-agent_dir = os.path.join(exp_dir, 'agent')
-
-# load agent
-agent = IQNAgent(env=env_to_pass_observer_behavior, params=params, agent_save_dir=agent_dir, 
-                 is_checkpoint_run=is_belief_observer, checkpoint_load='best')
-
-# agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
-# if is_belief_observer:
-#   agent._observer = observer
-
-behaviors = {"behavior_iqn_agent": agent}
-benchmark_runner = BenchmarkRunner(benchmark_database = db,
-                                    evaluators = evaluators,
-                                    terminal_when = terminal_when,
-                                    behaviors = behaviors,
-                                    num_scenarios=num_scenarios,
-                                    log_eval_avg_every = 1,
-                                    checkpoint_dir = "checkpoints",
-                                    deepcopy=False)
+evaluator = GoalReached(params)
 
 viewer = MPViewer(
   params=params,
@@ -137,23 +108,20 @@ viewer = MPViewer(
   enforce_x_length=True,
   x_length = 100.0,
   use_world_bounds=False)
-# viewer.show()
-result = benchmark_runner.run(viewer=viewer)
 
-# print(result.get_data_frame())
-result.dump(os.path.join(exp_dir, "benchmark_results_mid_dense_6_10"))
+# load env
+env = HyDiscreteHighway(params=params,
+                        scenario_generation=scenario_generator,
+                        behavior=behavior,
+                        evaluator=evaluator,
+                        observer=observer,
+                        viewer=viewer,
+                        render=False)
 
-result_loaded = result.load(os.path.join(exp_dir, "benchmark_results_mid_dense_6_10"))
-df = result.get_data_frame()
-os.makedirs(os.path.join(exp_dir, "benchmark"), exist_ok=True)
-benchmark_datafile = os.path.join(exp_dir, "benchmark/data_mid_dense_6_10")
-df.to_pickle(benchmark_datafile)
+# agent saved directory
+agent_dir = os.path.join(exp_dir, 'agent')
 
-if is_belief_observer:
-  os.makedirs(os.path.join(exp_dir, "beliefs"), exist_ok=True)
-  beliefs_data_filename = os.path.join(exp_dir, f"beliefs/data_{num_scenarios}_light_dense_12_16")
-  agent.save_beliefs_info(beliefs_data_filename)
+# load agent
+agent = IQNAgent(env=env, params=params, training_benchmark=TrainingBenchmarkDatabase(), agent_save_dir=agent_dir, checkpoint_load='best')
 
-  import pandas as pd
-  df = pd.read_pickle(beliefs_data_filename)
-  print(df.to_string())
+agent.evaluate()
