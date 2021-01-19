@@ -222,3 +222,39 @@ py_binary(
         "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/tests:test_demo_behavior",
     ],
 )
+
+py_binary(
+    name = "hy_iqn_resume_experiment",
+    srcs = [
+        "hy_iqn_resume_experiment.py",
+    ],
+    data = [
+        "//configuration/database",
+        "//configuration/params:hy_params",
+        "@bark_project//bark:generate_core",
+        "@bark_ml_project//bark_ml:generate_core",
+    ],
+    imports = [
+        "../bark/",
+        "../bark_mcts/",
+        "../bark_mcts/python_wrapper/",
+        "../bark_ml/",
+        "../bark_ml/python_wrapper",
+        "../python/",
+    ],
+    deps = [
+        "@bark_ml_project//bark_ml/environments:blueprints",
+        "@bark_ml_project//bark_ml/environments:gym",
+        "@bark_ml_project//bark_ml/library_wrappers/lib_fqf_iqn_qrdqn/agent:agents",
+        "@bark_project//bark/benchmark:benchmark_runner_mp",
+        "@benchmark_database//load:benchmark_database",
+        "@benchmark_database//serialization:database_serializer",
+        "@hythe//libs/blueprint",
+        "@hythe//libs/environments:gym",
+        "@hythe//libs/evaluation:evaluation",
+        "@hythe//libs/experiments:experiment",
+        "@hythe//libs/observer:belief_observer",
+        "@planner_uct//bark_mcts/runtime/scenario:config_readers",
+        "//configuration/src/common:common"
+    ],
+)
