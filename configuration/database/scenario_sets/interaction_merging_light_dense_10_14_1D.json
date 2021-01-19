@@ -27,8 +27,8 @@
                                 0
                             ],
                             "VehicleDistanceRange": [
-                                12,
-                                16
+                                4.0,
+                                8.0
                             ],
                             "OtherVehicleVelocityRange": [
                                 5.3,
