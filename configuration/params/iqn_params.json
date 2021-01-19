@@ -60,7 +60,7 @@
             "SummaryPath":"",
             "CheckpointPath":"",
             "NumSteps":50000000,
-            "BatchSize": 512,
+            "BatchSize": 1024,
             "MemorySize":100000,
             "Gamma":0.99,
             "Multi_step":4,
