@@ -34,6 +34,8 @@ from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent.demonstrations import (
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
 
+from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
+
 from load.benchmark_database import BenchmarkDatabase
 from serialization.database_serializer import DatabaseSerializer
 
@@ -44,7 +46,7 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
 
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.\
-            tests.test_demo_behavior import TestDemoBehavior          
+            tests.test_demo_behavior import TestDemoBehavior
 
 
 is_local = True
@@ -63,7 +65,8 @@ else:
   num_scenarios = 100
   num_demo_episodes = 1000
   # default dir with demonstrations data
-  demo_dir_default = "/mnt/glusterdata/home/ekumar/demonstrations/exp_aa3feb5b-f98e-4318-9bb8-c183eaad4c3a"
+  demo_dir_default = "/mnt/glusterdata/home/ekumar/demonstrations/exp_b72b9960-c5a1-4458-becc-0bc79f555571"
+
 
 
 def configure_args(parser=None):
@@ -127,13 +130,13 @@ def unpack_load_demonstrations(demo_root):
 
 def run(args, params, env, exp_exists=False, db=None):
 
-    demonstrations = None
     # add an eval criteria and generate demonstrations
     if is_generate_demonstrations:
       eval_criteria = {"goal_reached" : lambda x : x}
       demo_behavior, mcts_params = generate_uct_hypothesis_behavior()
       demonstrations = generate_demonstrations(params, env, eval_criteria, demo_behavior, db=db)
       print("Total demonstrations generated", len(demonstrations))
+
       ego_world_states = []
       # _, demonstrations = unpack_load_demonstrations(demo_root)
       for demo in demonstrations:
@@ -142,7 +145,10 @@ def run(args, params, env, exp_exists=False, db=None):
           ego_nn_input_state = deepcopy(nn_ip_state[0:env._observer._len_ego_state])
           ego_state[1:] = ego_nn_input_state
           reverted_observed_state = env._observer.rev_observe_for_ego_vehicle(ego_state)
-          ego_world_states.append((reverted_observed_state[int(StateDefinition.X_POSITION)], reverted_observed_state[int(StateDefinition.Y_POSITION)], reverted_observed_state[int(StateDefinition.THETA_POSITION)], reverted_observed_state[int(StateDefinition.VEL_POSITION)], action, int(is_demo)))  
+          ego_world_states.append((reverted_observed_state[int(StateDefinition.X_POSITION)],
+          reverted_observed_state[int(StateDefinition.Y_POSITION)],
+          reverted_observed_state[int(StateDefinition.THETA_POSITION)],
+          reverted_observed_state[int(StateDefinition.VEL_POSITION)], action, int(is_demo)))
       df = pd.DataFrame(ego_world_states, columns=['pos_x', 'pos_y', 'orientation', 'velocity', 'action', 'is_demo'])
       print(df.head(10))
       df.to_pickle(os.path.join(params["Experiment"]["dir"], "demonstrations/demo_dataframe"))
@@ -154,9 +160,9 @@ def run(args, params, env, exp_exists=False, db=None):
       else:
         collector, demonstrations = unpack_load_demonstrations(params["Experiment"]["dir"])
       if params["ML"]["BaseAgent"]["Multi_step"] is not None:
-        multistep_capacity = capacity + params["ML"]["BaseAgent"]["Multi_step"] - 1 
+        multistep_capacity = capacity + params["ML"]["BaseAgent"]["Multi_step"] - 1
       if multistep_capacity < len(demonstrations):
-        demonstrations = demonstrations[-multistep_capacity:]
+        demonstrations = demonstrations[:multistep_capacity]
         print("Pruned number of demonstrations", len(demonstrations))
       else:
         print("Number of demonstrations under capacity requested, using full demonstrations")
@@ -165,7 +171,7 @@ def run(args, params, env, exp_exists=False, db=None):
         # Assign steps by args
         params["ML"]["DemonstratorAgent"]["Agent"]["online_gradient_update_steps"] = args.grad_update_steps
       # Assign capacity by length of demonstrations
-      params["ML"]["BaseAgent"]["MemorySize"] = len(demonstrations)
+      params["ML"]["BaseAgent"]["MemorySize"] = capacity
       params["ML"]["DemonstratorAgent"]["Buffer"]["demo_ratio"] = 1.0
       agent = configure_agent(params, env)
       exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
@@ -182,7 +188,7 @@ def main():
     if is_local:
         dir_prefix = ""
     else:
-        dir_prefix="hy-iqnfd-exp.runfiles/hythe/"
+        dir_prefix="hy-iqnfd-beliefs-exp.runfiles/hythe/"
     print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
     params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params_demo_full_local.json"),
@@ -193,7 +199,19 @@ def main():
 
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
-    observer = NearestAgentsObserver(params)
+
+    params_behavior_filename = os.path.join(params["Experiment"]["dir"], "behavior_params_{}.json".format(experiment_id))
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"),
+                                      log_if_default=True)
+    params_behavior.Save(filename=params_behavior_filename)
+
+    # configure belief observer
+    splits = 2
+    behavior_space = BehaviorSpace(params_behavior)
+
+    hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+    observer = BeliefObserver(params, hypothesis_set, splits=splits)
+
     viewer = MPViewer(params=params,
                       x_range=[-35, 35],
                       y_range=[-35, 35],
@@ -232,6 +250,10 @@ def main():
     params.Save(params_filename)
     logging.info('-' * 60)
     logging.info("Writing params to :{}".format(params_filename))
+    logging.info('-' * 60)
+    params_behavior.Save(filename=params_behavior_filename)
+    logging.info('-' * 60)
+    logging.info("Writing behavior params to :{}".format(params_behavior_filename))
     logging.info('-' * 60)
 
 

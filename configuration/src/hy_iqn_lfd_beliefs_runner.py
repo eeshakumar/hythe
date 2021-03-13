@@ -5,13 +5,10 @@ import os
 from pathlib import Path
 from sys import argv
 import yaml
-import numpy as np
-import pandas as pd
-from copy import deepcopy
-from bark.core.models.dynamic import StateDefinition
 
 from hythe.libs.experiments.experiment import Experiment
 from bark.runtime.viewer.matplotlib_viewer import MPViewer
+from hythe.libs.observer.belief_observer import BeliefObserver
 
 from bark.runtime.commons.parameters import ParameterServer
 
@@ -24,6 +21,8 @@ from bark_ml.evaluators.goal_reached import GoalReached
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent import IQNAgent
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.agent.demonstrations import (
   DemonstrationCollector, DemonstrationGenerator)
+
+from bark_mcts.models.behavior.hypothesis.behavior_space.behavior_space import BehaviorSpace
 
 from bark_ml.observers.nearest_state_observer import NearestAgentsObserver
 from bark_ml.behaviors.discrete_behavior import BehaviorDiscreteMacroActionsML
@@ -38,19 +37,19 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
 
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.\
-            tests.test_demo_behavior import TestDemoBehavior
+            tests.test_demo_behavior import TestDemoBehavior          
 
 
-is_local = True
+is_local = False
 
 if is_local:
-  num_episodes = 5
+  num_episodes = 10
   num_scenarios = 1
-  trained_only_demonstrations_path = "/home/ekumar/output/experiments/exp_8b5b0dfc-3320-4033-8a7d-9446a60061cf"
+  trained_only_demonstrations_path = "/home/ekumar/master_thesis/results/training/december/iqn/lfd/stats/exp_2s_be_di64"
 else:
   num_episodes = 50000
   num_scenarios = 1000
-  trained_only_demonstrations_path = "/mnt/glusterdata/home/ekumar/output/experiments/exp_stats_iqn_red_q/"
+  trained_only_demonstrations_path = "/mnt/glusterdata/home/ekumar/output/experiments/exp_2s_be_di64"
 
 
 def configure_args(parser=None):
@@ -90,26 +89,7 @@ def run(params, env, exp_exists=False):
     logging.info(f"summary written every: {agent.summary_log_interval}")
     exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
     exp.run(demonstrator=True, demonstrations=None, num_episodes=num_episodes)
-    ego_world_states = []
-    memory = agent.memory
-    learned_states = memory["state"]
-    actions = memory['action']
-    is_demos = memory['is_demo']
-    for state, action, is_demo in zip(learned_states, actions, is_demos):
-        ego_state = np.zeros((env._observer._len_ego_state + 1))
-        ego_nn_input_state = deepcopy(state[0:env._observer._len_ego_state])
-        ego_state[1:] = ego_nn_input_state
-        reverted_observed_state = env._observer.rev_observe_for_ego_vehicle(ego_state)
-        ego_world_states.append((reverted_observed_state[int(StateDefinition.X_POSITION)],
-        reverted_observed_state[int(StateDefinition.Y_POSITION)],
-        reverted_observed_state[int(StateDefinition.THETA_POSITION)],
-        reverted_observed_state[int(StateDefinition.VEL_POSITION)], action[0], is_demo[0]))
-    df = pd.DataFrame(ego_world_states, columns=['pos_x', 'pos_y', 'orientation', 'velocity', 'action', 'is_demo'])
-    print(df.tail(10))
-    if not os.path.exists(os.path.join(params["Experiment"]["dir"], "demonstrations")):
-      os.makedirs(os.path.join(params["Experiment"]["dir"], "demonstrations"))
-    df.to_pickle(os.path.join(params["Experiment"]["dir"], "demonstrations/learned_dataframe"))
-    print("Training on", env._observer._world_x_range, env._observer._world_y_range)
+
 
 def check_if_exp_exists(params):
   return os.path.isdir(params["Experiment"]["dir"])
@@ -120,9 +100,10 @@ def main():
     if is_local:
         dir_prefix = ""
     else:
-        dir_prefix="hy-iqn-lfd-exp.runfiles/hythe/"
+        dir_prefix="hy-iqn-lfd-beliefs-exp.runfiles/hythe/"
     print("Executing job :", args.jobname)
     print("Experiment server at :", os.getcwd())
+    print(dir_prefix)
     params = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/iqn_params_demo.json"),
                              log_if_default=True)
     params = configure_params(params, seed=args.jobname)
@@ -130,9 +111,20 @@ def main():
     experiment_id = params["Experiment"]["random_seed"]
     params_filename = os.path.join(params["Experiment"]["dir"], "params_{}.json".format(experiment_id))
 
+    # configure belief observer 
+    params_behavior_filename = os.path.join(params["Experiment"]["dir"], "behavior_params_{}.json".format(experiment_id))
+    params_behavior = ParameterServer(filename=os.path.join(dir_prefix, "configuration/params/1D_desired_gap_no_prior.json"),
+                                      log_if_default=True)
+    params_behavior.Save(filename=params_behavior_filename)
+
+    splits = 2
+    behavior_space = BehaviorSpace(params_behavior)
+
+    hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
+    observer = BeliefObserver(params, hypothesis_set, splits=splits)
+  
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
-    observer = NearestAgentsObserver(params)
     viewer = MPViewer(params=params,
                       x_range=[-35, 35],
                       y_range=[-35, 35],
