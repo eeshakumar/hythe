@@ -47,8 +47,8 @@ logging.info("Logging into: {}".format(log_folder))
 bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 
 # reduced max steps and scenarios for testing
-max_steps = 10000
-num_scenarios = 100
+max_steps = 65
+num_scenarios = 10
 
 
 def configure_args():
@@ -77,7 +77,7 @@ exp_dir = args.checkpoint_dir
 is_belief_observer = args.belief_observer
 
 if exp_dir is None:
-  exp_dir = "/home/ekumar/master_thesis/results/training/december/iqn/exp_iqn_default"
+  exp_dir = "results/training/toy_benchmark_pickable"
 print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
@@ -122,6 +122,8 @@ env = HyDiscreteHighway(params=params,
 agent_dir = os.path.join(exp_dir, 'agent')
 
 # load agent
-agent = IQNAgent(env=env, params=params, training_benchmark=TrainingBenchmarkDatabase(), agent_save_dir=agent_dir, checkpoint_load='best')
+agent = IQNAgent(env=env, params=params, agent_save_dir=agent_dir, 
+                 is_checkpoint_run=True, is_online_demo=False)
+agent.load_models(IQNAgent.check_point_directory(agent.agent_save_dir, "best"))
 
 agent.evaluate()

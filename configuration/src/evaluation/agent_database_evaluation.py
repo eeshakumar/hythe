@@ -49,9 +49,10 @@ logging.info("Logging into: {}".format(log_folder))
 bark.core.commons.GLogInit(sys.argv[0], log_folder, 3, True)
 
 # reduced max steps and scenarios for testing
-max_steps = 100
-num_scenarios = 100
+max_steps = 50
+num_scenarios = 2
 
+is_checkpoint_run = True
 
 def configure_args():
     parser = ArgumentParser()
@@ -64,8 +65,8 @@ logging.getLogger().setLevel(logging.INFO)
 print("Experiment server at :", os.getcwd())
 
 dbs = DatabaseSerializer(test_scenarios=num_scenarios, test_world_steps=20, num_serialize_scenarios=num_scenarios)
-dbs.process("configuration/database", filter_sets="**/**/interaction_merging_mid_dense_1D_new.json")
-local_release_filename = dbs.release(version="tmp2_md")
+dbs.process("configuration/database", filter_sets="**/**/interaction_merging_light_dense_1D.json")
+local_release_filename = dbs.release(version="tmp2")
 
 db = BenchmarkDatabase(database_root=local_release_filename)
 scenario_generator, _, _ = db.get_scenario_generator(0)
@@ -79,7 +80,7 @@ exp_dir = args.checkpoint_dir
 is_belief_observer = args.belief_observer
 
 if exp_dir is None:
-  exp_dir = "/home/ekumar/master_thesis/results/training/december/iqn/exp_iqn_lbnw"
+  exp_dir = "results/training/toy_benchmark_pickable"
 print("Loading results from :", exp_dir)
 
 params_filename = glob.glob(os.path.join(exp_dir, "params*"))[0]
@@ -115,14 +116,12 @@ agent_dir = os.path.join(exp_dir, 'agent')
 
 # load agent
 agent = IQNAgent(env=env_to_pass_observer_behavior, params=params, agent_save_dir=agent_dir, 
-                 is_checkpoint_run=is_belief_observer, checkpoint_load='best')
-
-# agent.load_models(os.path.join(exp_dir, "agent/checkpoints/best"))
-# if is_belief_observer:
-#   agent._observer = observer
+                 is_checkpoint_run=is_checkpoint_run, is_be_obs=is_belief_observer, checkpoint_load='best',
+                 is_online_demo=False)
+agent.is_be_obs = is_belief_observer
 
 behaviors = {"behavior_iqn_agent": agent}
-benchmark_runner = BenchmarkRunner(benchmark_database = db,
+benchmark_runner = BenchmarkRunner(benchmark_database = db, 
                                     evaluators = evaluators,
                                     terminal_when = terminal_when,
                                     behaviors = behaviors,
@@ -137,16 +136,21 @@ viewer = MPViewer(
   enforce_x_length=True,
   x_length = 100.0,
   use_world_bounds=False)
-# viewer.show()
-result = benchmark_runner.run(viewer=viewer)
 
-# print(result.get_data_frame())
-result.dump(os.path.join(exp_dir, "benchmark_results_mid_dense_6_10"))
+# video_renderer = VideoRenderer(renderer=viewer, world_step_time=0.2)
 
-result_loaded = result.load(os.path.join(exp_dir, "benchmark_results_mid_dense_6_10"))
+# result = benchmark_runner.run(viewer=video_renderer)
+result = benchmark_runner.run()
+
+# video_renderer.export_video(os.path.join(exp_dir, "video"))
+
+print(result.get_data_frame())
+result.dump(os.path.join(exp_dir, "benchmark_results_light_dense_12_16"))
+
+result_loaded = result.load(os.path.join(exp_dir, "benchmark_results_light_dense_12_16"))
 df = result.get_data_frame()
 os.makedirs(os.path.join(exp_dir, "benchmark"), exist_ok=True)
-benchmark_datafile = os.path.join(exp_dir, "benchmark/data_mid_dense_6_10")
+benchmark_datafile = os.path.join(exp_dir, f"benchmark/data_{num_scenarios}_light_dense_12_16")
 df.to_pickle(benchmark_datafile)
 
 if is_belief_observer:
@@ -156,4 +160,3 @@ if is_belief_observer:
 
   import pandas as pd
   df = pd.read_pickle(beliefs_data_filename)
-  print(df.to_string())
