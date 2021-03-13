@@ -9,6 +9,7 @@ import logging
 import os
 from pathlib import Path
 from sys import argv
+import numpy as np
 import yaml
 from copy import deepcopy
 import time
@@ -44,16 +45,8 @@ from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabas
 from bark_ml.library_wrappers.lib_fqf_iqn_qrdqn.\
             tests.test_demo_behavior import TestDemoBehavior   
 
-demo_root = "/home/ekumar/output/experiments/exp_72f85489-b3db-4fdf-99fe-fe48c2b0730e"
-
-def unpack_load_demonstrations(demo_root):
-    demo_dir = os.path.join(demo_root, "demonstrations/generated_demonstrations")
-    collector = DemonstrationCollector.load(demo_dir)
-    return collector, collector.GetDemonstrationExperiences()
-
 
 class TestObsTrajExtraction(unittest.TestCase):
-
 
     def test_obs_traj(self):
         map_filename = "external/bark_ml_project/bark_ml/environments/blueprints/highway/city_highway_straight.xodr"
@@ -73,10 +66,8 @@ class TestObsTrajExtraction(unittest.TestCase):
                                 viewer=viewer,
                                 render=True)
         env.reset()
-        import numpy as np
         actions = np.random.randint(0, 7, 100)
         for action in actions:
-
             concatenated_state, _, _, _ = env.step(action)
             nn_ip_state = concatenated_state
             ego_nn_input_state = deepcopy(concatenated_state[0:observer._len_ego_state])

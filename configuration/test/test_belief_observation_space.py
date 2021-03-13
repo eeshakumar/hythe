@@ -27,7 +27,7 @@ class HyBeliefObserverationSpaceTEsts(unittest.TestCase):
     @timer
     def test_belief_observer_observation_space(self):
         params = ParameterServer(
-            filename="configuration/params/fqf_params.json")
+            filename="configuration/params/iqn_params.json")
         splits = 8
         params_behavior = ParameterServer(
             filename="configuration/params/1D_desired_gap_no_prior.json")
