@@ -13,6 +13,7 @@ import os
 import pandas as pd
 import sys
 import yaml
+from copy import deepcopy
 
 from argparse import ArgumentParser
 from collections import OrderedDict
@@ -120,11 +121,15 @@ def main():
     discretize = observer.is_discretize
     
     beliefs_df = pd.DataFrame(columns=["Step", "Action", "Agent", "Beliefs", "HyNum"])
+    beliefs_orig_df = pd.DataFrame(columns=["Step", "Action", "Agent", "Beliefs", "HyNum"])
     while step <= num_steps:
         action = 5 #np.random.randint(0, behavior.action_space.n)
         next_state, reward, done, info = env.step(action)
         for agent, beliefs in observer.beliefs.items():
             beliefs = np.asarray(beliefs)
+            oring = deepcopy(beliefs)
+            for i, belief in enumerate(oring):
+                beliefs_orig_df = beliefs_orig_df.append({"Step": step, "Action": action, "Agent": agent, "Beliefs": belief, "HyNum": i}, ignore_index=True)
             if discretize:
               beliefs = observer.discretize_beliefs(beliefs)
             if threshold:
@@ -142,6 +147,12 @@ def main():
     beliefs_data_filename += suffix
     print(beliefs_data_filename)
     beliefs_df.to_pickle(os.path.join(str(Path.home()), "master_thesis/code/hythe-src/beliefs_data/", beliefs_data_filename))
+
+    beliefs_data_filename = "orig_beliefs_{}_{}_{}".format(splits, num_samples, num_steps)
+    beliefs_data_filename += suffix
+    print(beliefs_data_filename)
+    beliefs_orig_df.to_pickle(os.path.join(str(Path.home()), "master_thesis/code/hythe-src/beliefs_data/", beliefs_data_filename))
+
     video_filename = os.path.join(str(Path.home()), "master_thesis/code/hythe-src/beliefs_data/", "video_{}".format(num_samples))
     print(video_filename)
     video_filename += suffix

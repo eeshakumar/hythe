@@ -1,7 +1,7 @@
 py_binary(
-    name = "hy_plot_beliefs",
+    name = "hy_collect_beliefs",
     srcs = [
-        "hy_plot_beliefs.py",
+        "hy_collect_beliefs.py",
     ],
     data = [
         "//configuration/database",
@@ -17,7 +17,7 @@ py_binary(
         "../bark_ml/python_wrapper",
         "../python/",
     ],
-    main = "hy_plot_beliefs.py",
+    main = "hy_collect_beliefs.py",
     deps = [
         "@bark_ml_project//bark_ml/environments:blueprints",
         "@bark_ml_project//bark_ml/environments:gym",
