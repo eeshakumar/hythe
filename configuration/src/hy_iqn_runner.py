@@ -30,11 +30,11 @@ add_config_reader_module("bark_mcts.runtime.scenario.behavior_space_sampling")
 from libs.evaluation.training_benchmark_database import TrainingBenchmarkDatabase
 
 
-is_local = False
+is_local = True
 
 if is_local:
-  num_episodes = 10000
-  num_scenarios = 200
+  num_episodes = 10
+  num_scenarios = 2
 else:
   num_episodes = 50000
   num_scenarios = 1000
@@ -77,7 +77,7 @@ def run(params, env, exp_exists=False):
         print("Loading from last best checkpoint.")
         agent.load_models(agent_checkpoint_last)
       else:
-        print("No checkpoint written.") 
+        print("No checkpoint written.")
     exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
     exp.run()
 
@@ -107,7 +107,7 @@ def main():
       if os.path.isfile(params_filename):
         params = ParameterServer(filename=params_filename, log_if_default=True)
     else:
-      Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)  
+      Path(params["Experiment"]["dir"]).mkdir(parents=True, exist_ok=True)
 
     behavior = BehaviorDiscreteMacroActionsML(params)
     evaluator = GoalReached(params)
@@ -140,7 +140,7 @@ def main():
                             evaluator=evaluator,
                             observer=observer,
                             viewer=viewer,
-                            render=is_local)
+                            render=False)
     assert env.action_space._n == 8, "Action Space is incorrect!"
     run(params, env, exp_exists)
     params.Save(params_filename)

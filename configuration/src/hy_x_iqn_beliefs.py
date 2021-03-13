@@ -97,7 +97,7 @@ def run(params, env, exp_exists):
         agent.load_models(agent_checkpoint_last)
       else:
         print("No checkpoint written.")
-    exp = Experiment(params=params, agent=agent, dump_scenario_interval=10000)
+    exp = Experiment(params=params, agent=agent, dump_scenario_interval=25000)
     exp.run()
 
 def check_if_exp_exists(params):
@@ -136,7 +136,7 @@ def main():
     params_behavior.Save(filename=params_behavior_filename)
 
     # configure belief observer
-    splits = 8
+    splits = 2
     behavior_space = configure_behavior_space(params_behavior)
 
     hypothesis_set, hypothesis_params = behavior_space.create_hypothesis_set_fixed_split(split=splits)
@@ -153,7 +153,7 @@ def main():
     # database creation
     dbs = DatabaseSerializer(test_scenarios=2, test_world_steps=2,
                              num_serialize_scenarios=num_scenarios)
-    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_light_dense_1D.json")
+    dbs.process(os.path.join(dir_prefix, "configuration/database"), filter_sets="**/**/interaction_merging_mid_dense_1D_new.json")
     local_release_filename = dbs.release(version="test")
     db = BenchmarkDatabase(database_root=local_release_filename)
     scenario_generator, _, _ = db.get_scenario_generator(scenario_set_id=0)
@@ -164,6 +164,7 @@ def main():
                             observer=observer,
                             viewer=viewer,
                             render=is_local)
+    print('Observation/state space size', env.observation_space)
 
     run(params, env, exp_exists)
     params.Save(filename=params_filename)
