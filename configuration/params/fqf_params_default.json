@@ -1,0 +1,204 @@
+{
+    "World": {
+        "remove_agents_out_of_map": true
+    },
+    "BehaviorDynamicModel": {
+        "IntegrationTimeDelta": 0.05000000074505806
+    },
+    "ML": {
+        "GoalReachedEvaluator": {
+            "GoalReward": 1.0,
+            "CollisionPenalty": -1.0,
+            "MaxSteps": 60
+        },
+        "StateObserver": {
+            "VelocityRange": [
+                0,
+                50
+            ],
+            "ThetaRange": [
+                0,
+                6.283185307179586
+            ],
+            "NormalizationEnabled": true,
+            "MaxNumAgents": 4
+        },
+        "BeliefObserver": {
+            "EnableThreshold": true,
+            "Threshold": 0.05,
+            "Discretize": true,
+            "NumBuckets": 16
+        },
+        "NearestAgentsObserver": {
+            "MaxOtherDistance": 100
+        },
+        "FQNModel": {
+            "Target": false,
+            "EmbeddingDims": 512,
+            "HiddenDims": 512
+        },
+        "FQFAgent": {
+            "N": 32,
+            "Kappa": 1.0,
+            "Ent_coefs": 0,
+            "FractionalLearningRate": 5e-06,
+            "QuantileLearningRate": 5e-06,
+            "NumCosines": 64
+        },
+        "BaseAgent": {
+            "SummaryPath": "/mnt/glusterdata/home/ekumar/results/training/summaries",
+            "CheckpointPath": "/mnt/glusterdata/home/ekumar/results/training/checkpoints",
+            "NumSteps": 50000000,
+            "BatchSize": 512,
+            "MemorySize": 100000,
+            "Gamma": 0.99,
+            "Multi_step": 4,
+            "Update_interval": 4,
+            "TargetUpdateInterval": 100,
+            "StartSteps": 5000,
+            "EpsilonTrain": 0.1,
+            "EpsilonEval": 0.01,
+            "EpsilonDecaySteps": 25000,
+            "Double_q_learning": true,
+            "DuelingNet": false,
+            "NoisyNet": false,
+            "Use_per": true,
+            "SummaryLogInterval": 100,
+            "RewardLogInterval": 100,
+            "EvalInterval": 1000,
+            "NumEvalSteps": 5000,
+            "MaxEpisodeSteps": 100000,
+            "GradCliping": 5.0,
+            "Cuda": true,
+            "Seed": 0
+        },
+        "BehaviorMPMacroActions": {
+            "BehaviorMPMacroActions": {
+                "CheckValidityInPlan": false
+            },
+            "BehaviorMotionPrimitives": {
+                "IntegrationTimeDelta": 0.019999999552965164
+            },
+            "AccelerationInputs": [
+                0.0,
+                1.0,
+                -1.0,
+                -2.0,
+                -5.0
+            ],
+            "BehaviorIDMClassic": {
+                "MinimumSpacing": 1.0,
+                "DesiredTimeHeadway": 0.0,
+                "MaxAcceleration": 1.7000000476837158,
+                "AccelerationLowerBound": -5.0,
+                "AccelerationUpperBound": 5.0,
+                "DesiredVelocity": 15.0,
+                "ComfortableBrakingAcceleration": 1.6699999570846558,
+                "MinVelocity": 0.0,
+                "MaxVelocity": 50.0,
+                "Exponent": 4,
+                "BrakeForLaneEnd": true,
+                "BrakeForLaneEndEnabledDistance": 60.0,
+                "BrakeForLaneEndDistanceOffset": 20.0,
+                "NumTrajectoryTimePoints": 11,
+                "CoolnessFactor": 0.0
+            },
+            "BehaviorIDMLaneTracking": {
+                "CrosstrackErrorGain": 2.0
+            },
+            "PrimitiveConstAccStayLane": {
+                "Acceleration": 0.0
+            },
+            "MinLength": 0.0,
+            "AddLaneChangeActions": true,
+            "AddGapKeeping": true
+        },
+        "FQFModel": {
+            "Target": false,
+            "EmbeddingDims": 512,
+            "HiddenDims": 512
+        }
+    },
+    "agent": {
+        "MaxHistoryLength": 50
+    },
+    "Visualization": {
+        "Agents": {
+            "Color": {
+                "Other": {
+                    "Lines": [
+                        0.7,
+                        0.7,
+                        0.7
+                    ],
+                    "Face": [
+                        0.7,
+                        0.7,
+                        0.7
+                    ]
+                },
+                "Controlled": {
+                    "Lines": [
+                        0.0,
+                        0.27,
+                        0.58
+                    ],
+                    "Face": [
+                        0.49,
+                        0.63,
+                        0.83
+                    ]
+                },
+                "UseColormapForOtherAgents": false,
+                "IfColormapUseLineColorOthers": true
+            },
+            "Alpha": {
+                "Controlled": 1.0,
+                "Other": 1
+            },
+            "ColorRoute": [
+                0.2,
+                0.2,
+                0.2
+            ],
+            "DrawRoute": false,
+            "DrawAgentId": true,
+            "DrawEvalGoals": true,
+            "EvalGoalColor": [
+                0.49,
+                0.63,
+                0.83
+            ],
+            "DrawHistory": false,
+            "DrawHistoryDrawFace": true
+        },
+        "Map": {
+            "XodrLanes": {
+                "Boundaries": {
+                    "Color": [
+                        0.7,
+                        0.7,
+                        0.7
+                    ],
+                    "Alpha": 1.0,
+                    "Linewidth": 1.0
+                }
+            },
+            "Plane": {
+                "Color": [
+                    1,
+                    1,
+                    1,
+                    1
+                ],
+                "Alpha": 1.0
+            }
+        },
+        "Evaluation": {
+            "DrawLTLDebugInfo": false
+        }
+    },
+    "Experiment": {
+        "random_seed": "MISSING"
+    }
+}

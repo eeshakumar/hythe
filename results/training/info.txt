@@ -1,0 +1,6 @@
+--> All network related params file in respective exp folder as params_EXPID
+
+be_1d_8s: Bhevaior Params: 1d no prior params with 8 splits of the behavior hypothesis ==> 1D_desired_gap_no_prior.json
+fqf_higher_exploration: params with increased final value of epsilon(exploration) 
+fqf_1: experiment with default params
+
