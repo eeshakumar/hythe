@@ -1,0 +1,42 @@
+#! /usr/bin/python
+
+import subprocess
+
+class Job(object):
+    def __init__(self, state, resource_string):
+	self.state = state
+        self.cpu, self.mem, self.gpu = self.parse_resource_string(resource_string)
+
+    def parse_resource_string(self, resource_string):
+        cpu, mem, gpu = 0, 0, 0
+	resources = resource_string.split(",")
+        for r in resources:
+            if r.startswith("cpu="):
+                cpu = int(r.split("=")[1])
+            if r.startswith("gres/gpu="):
+                gpu = int(r.split("=")[1])
+            if r.startswith("mem="):
+                mem = r.split("=")[1]
+                if mem.endswith("G"):
+                   mem = float(mem[:-1])
+                elif mem.endswith("M"):
+                   mem = float(mem[:-1])/1000
+                else:
+                   raise ValueError("Did not recognize mem with %s" %mem)
+        return cpu, mem, gpu
+
+result = subprocess.check_output("squeue -r -hO state:20,tres:100", shell=True).decode("utf-8").strip()
+jobs = result.split("\n")
+jobs = [Job(*r.split()) for r in jobs]
+
+def compute_total(jobs, filter_state=None):
+    if filter_state is not None:
+        jobs = [j for j in jobs if j.state in filter_state]
+    cpus = sum([job.cpu for job in jobs])
+    mem = sum([job.mem for job in jobs])
+    gpus = sum([job.gpu for job in jobs])
+    return cpus, mem, gpus
+
+print("Running:  {:>5} cpus {:>10}G mem {:>5} gpus".format(*compute_total(jobs, filter_state=["RUNNING"])))
+print("All jobs: {:>5} cpus {:>10}G mem {:>5} gpus".format(*compute_total(jobs)))
+print("\n\n")
